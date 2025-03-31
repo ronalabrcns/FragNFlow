@@ -1,0 +1,7 @@
+work/
+output/
+config_tools/
+data/
+
+.nextflow*
+.update-timestamp
