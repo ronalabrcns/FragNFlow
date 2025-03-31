@@ -22,12 +22,15 @@ process PULLMSCONVERTER {
 }
 
 process MSCONVERTER {
-    clusterOptions '--account=sznistvan', '--job-name=nf-conv', '--partition=all'
-    publishDir "output/msconverter", mode: 'copy'
-    //container 'proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses'
+    //clusterOptions '--account=sznistvan', '--job-name=nf-conv', '--partition=all'
+    publishDir "output/msconverter", mode: 'move'
+    container 'proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses'
+    containerOptions '--cleanenv --bind $PWD:/data --writable-tmpfs'
     input:
         path input_file
 
+    output:
+        path 'output_converted'
 
     script:
     """
@@ -36,7 +39,7 @@ process MSCONVERTER {
     echo $workDir
     #mkdir $workDir/mountdata
     #mkdir $workDir/output_converted
-    chmod 777 $workDir/mountdata
+    #chmod 777 $workDir/mountdata
     
     #mywine msconvert --help
 
@@ -45,9 +48,13 @@ process MSCONVERTER {
     #        $workDir/singularity/proteowizard-pwiz-skyline-i-agree-to-the-vendor-licenses.img\
     #        mywine msconvert {} --outdir $workDir/output_converted
 
-    singularity exec --cleanenv --bind $workDir/mountdata:/data --writable-tmpfs\
-            $workDir/singularity/proteowizard-pwiz-skyline-i-agree-to-the-vendor-licenses.img\
-            mywine msconvert $input_file\
-            --32 --zlib --filter "peakPicking true 1-" --filter "zeroSamples removeExtra" --outdir $workDir/output_converted
+    #mywine msconvert --help || true
+
+    #singularity exec --cleanenv --bind $workDir/mountdata:/data --writable-tmpfs\
+    #        $workDir/singularity/proteowizard-pwiz-skyline-i-agree-to-the-vendor-licenses.img\
+    #        mywine msconvert $input_file\
+    #        --32 --zlib --filter "peakPicking true 1-" --filter "zeroSamples removeExtra" --outdir output_converted
+    mywine msconvert $input_file\
+        --32 --zlib --filter "peakPicking true 1-" --filter "zeroSamples removeExtra" --outdir output_converted || true
     """
 }

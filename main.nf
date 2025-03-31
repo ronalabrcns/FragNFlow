@@ -72,12 +72,10 @@ def addDownloadInformation(){
 // MSConverter sub-workflow LATER
 workflow MSCONVERTER_WF{
     // Define the processes and their order
-    PULLMSCONVERTER()
-    ch_input_folder = Channel.fromPath('/home/rona/sznistvan/Nextflow/test_msconverter/my_data/*.raw')
-    ch_input_folder.view()
-    ch_cpus = Channel.of(params.cpus)
-
-    MSCONVERTER(ch_input_folder)
+    //PULLMSCONVERTER()
+    ch_input_file = Channel.fromPath("${params.input_folder}/*.raw").buffer(size:2, remainder:true)
+        
+    MSCONVERTER(ch_input_file)
 }
 
 // FragPipe sub-workflows
@@ -165,14 +163,13 @@ workflow {
     threads = Channel.of(params.threads)
     ram = Channel.of(params.ram)
 
-    //Config Tools
-    addDownloadInformation()
-
     if (!params.disable_msconvert){
-        //MSCONVERTER_WF()
-        //new input folder
+        MSCONVERTER_WF()
     }
     if (!params.disable_fragpipe){
+        //Config Tools
+        addDownloadInformation()
+        
         CONFIG_TOOLS_WF(download_name, download_email, download_institution, license_accept,
                     ionquant_jar, msfragger_jar, diatracer_jar, diann, params.diann_download, 
                     params.config_tools_update)
