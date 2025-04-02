@@ -12,29 +12,33 @@ process FILELIST {
     """
 }
 
-process PULLMSCONVERTER {
-    //publishDir "output/msconverter", mode: 'copy'
-    container 'proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses'
+process MSCONVERTER_FOLDER {
+    input:
+        val filelist
 
+    output:
+        env 'msconverter_folder'
+    script:
     """
-    echo Pulling msconverter image
+    msconverter_folder="${launchDir}/output/msconverter"
     """
 }
 
 process MSCONVERTER {
     //clusterOptions '--account=sznistvan', '--job-name=nf-conv', '--partition=all'
-    publishDir "output/msconverter", mode: 'move'
+    publishDir "output/msconverter", mode: 'move', override: true
     container 'proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses'
     containerOptions '--cleanenv --bind $PWD:/data --writable-tmpfs'
     input:
         path input_file
 
     output:
-        path 'output_converted'
+        path "*.mzML"
 
     script:
     """
     echo $input_file
+    echo ${input_file.baseName}
     echo $projectDir
     echo $workDir
     #mkdir $workDir/mountdata
@@ -54,7 +58,21 @@ process MSCONVERTER {
     #        $workDir/singularity/proteowizard-pwiz-skyline-i-agree-to-the-vendor-licenses.img\
     #        mywine msconvert $input_file\
     #        --32 --zlib --filter "peakPicking true 1-" --filter "zeroSamples removeExtra" --outdir output_converted
-    mywine msconvert $input_file\
-        --32 --zlib --filter "peakPicking true 1-" --filter "zeroSamples removeExtra" --outdir output_converted || true
+    
+
+    #mywine msconvert $input_file\
+    #    --32 --zlib --filter "peakPicking true 1-" --filter "zeroSamples removeExtra" --outfile ${input_file.baseName}.mzML
+
+    for file in $input_file; do
+        extension="\${file##*.}"
+        filename_no_ext="\${file%.\$extension}"
+
+        #mywine msconvert $input_file --32 --zlib --filter "peakPicking true 1-" --filter "zeroSamples removeExtra" --outfile \${filename_no_ext}.mzML
+        
+        echo "asdasd text to file" > \${filename_no_ext}.mzML
+    done
+
+    MSCONVERTER_OUTPUT_DIR="${launchDir}/output/msconverter"
+    
     """
 }

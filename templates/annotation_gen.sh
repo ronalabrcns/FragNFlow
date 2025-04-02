@@ -34,8 +34,7 @@ for file in "$input_folder_workflow"/*; do
             if [[ "${parts[-2]}" =~ ^[0-9]+$ ]]; then
                 # If second-to-last part is a number, it's bioreplicate
                 bioreplicate="${parts[-2]}"
-                if [[ $(#parts[@]) -gt 3 ]]; then
-                    # If there are more than two parts, the third-to-last part is experiment
+                if [[ ${#parts[@]} > 3 ]]; then
                     experiment="${parts[-3]}"
                 else
                     # If only two parts, treat the experiment blank

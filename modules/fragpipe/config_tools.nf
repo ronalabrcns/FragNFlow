@@ -32,7 +32,6 @@ process IONQUANT_DOWNLOAD{
     output:
         path 'IonQuant-*.jar'
         //path 'LICENSE_ionquant.pdf'
-
     script:
         """
         NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/ionquant/latest_version.php)

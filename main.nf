@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 
 // Parameters these can be fetched into a yaml file later!
 
-include { PULLMSCONVERTER; MSCONVERTER } from './modules/msconverter/msconverter.nf'
+include { MSCONVERTER; MSCONVERTER_FOLDER } from './modules/msconverter/msconverter.nf'
 include { MANIFEST } from './modules/headless_setup/annotation.nf'
 include { DATABASE } from './modules/headless_setup/database.nf'
 include { WORKFLOW_DB } from './modules/headless_setup/workflow.nf'
@@ -73,9 +73,30 @@ def addDownloadInformation(){
 workflow MSCONVERTER_WF{
     // Define the processes and their order
     //PULLMSCONVERTER()
-    ch_input_file = Channel.fromPath("${params.input_folder}/*.raw").buffer(size:2, remainder:true)
-        
-    MSCONVERTER(ch_input_file)
+    take:
+        raw_file_type
+        batch_size
+
+    main:
+        // if (raw_file_type == "raw" || raw_file_type == ""){
+        //     ch_input_file = Channel.fromPath("${params.input_folder}/*.raw").buffer(size:params.batch_size, remainder:true)
+        // }
+        // else{
+        //     ch_input_file = Channel.fromPath("${params.input_folder}/*.${raw_file_type}").buffer(size:params.batch_size, remainder:true)
+        // }
+        ch_input_file = Channel.fromPath("${params.input_folder}/*.raw").buffer(size:params.batch_size, remainder:true)
+        MSCONVERTER(ch_input_file)
+
+        MSCONVERTER.out.flatten().collect().view {c -> "Msconverter output: $c"}
+
+        // TODO: collect all the outputs .out.collect()
+        // emit output from subworkflow
+        //MSCONVERTER_FOLDER(MSCONVERTER.out().collect())
+        MSCONVERTER_FOLDER(MSCONVERTER.out.flatten().collect())
+
+        MSCONVERTER_FOLDER.out.view{folder -> "The MSconverter output folder path is: $folder"}
+    emit:
+        MSCONVERTER_FOLDER.out
 }
 
 // FragPipe sub-workflows
@@ -155,6 +176,8 @@ workflow FP_ANALYST_WF{
 // Main workflow
 workflow {
     input_folder = Channel.of(params.input_folder)
+    raw_file_type = Channel.of(params.raw_file_type)
+    batch_size = Channel.of(params.batch_size)
     output_folder = Channel.fromPath(params.output_folder)
     mode = Channel.of(params.mode)
     workflow = Channel.of(params.workflow)
@@ -164,7 +187,8 @@ workflow {
     ram = Channel.of(params.ram)
 
     if (!params.disable_msconvert){
-        MSCONVERTER_WF()
+        println "hello"
+        MSCONVERTER_WF(raw_file_type, batch_size)
     }
     if (!params.disable_fragpipe){
         //Config Tools
@@ -173,10 +197,18 @@ workflow {
         CONFIG_TOOLS_WF(download_name, download_email, download_institution, license_accept,
                     ionquant_jar, msfragger_jar, diatracer_jar, diann, params.diann_download, 
                     params.config_tools_update)
-
-        FRAGPIPE_WF(CONFIG_TOOLS_WF.out, input_folder, output_folder, 
+        //TODO: add if else for msconverter part
+        //input_folder = the params input_folder OR the output of msconverter
+        if (params.disable_msconvert){
+            FRAGPIPE_WF(CONFIG_TOOLS_WF.out, input_folder, output_folder, 
                     mode, workflow, fasta_file, 
                     decoy_tag, threads, ram, params.diann_download, params.analyst_mode)
+        }
+        else{
+            FRAGPIPE_WF(CONFIG_TOOLS_WF.out, MSCONVERTER_WF.out, output_folder, 
+                        mode, workflow, fasta_file, 
+                        decoy_tag, threads, ram, params.diann_download, params.analyst_mode)
+        }
     }
     if (!params.disable_fp_analyst){
         if (!params.disable_fragpipe){

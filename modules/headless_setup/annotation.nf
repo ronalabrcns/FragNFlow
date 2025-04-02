@@ -15,6 +15,8 @@ process MANIFEST{
     """
     rm -rf $baseDir/data/manifest
 
+    echo $input_folder_workflow
+
     bash $baseDir/templates/annotation_gen.sh $input_folder_workflow $mode
     """
 }
