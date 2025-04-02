@@ -32,10 +32,11 @@ def addDownloadInformation(){
     diatracer_jar = configToolsDir.list({ dir, name -> name.startsWith("diaTracer-") && name.endsWith(".jar") })?.length > 0
     diann = file(projectDir + '/config_tools/diann').isDirectory()
 
-    println ionquant_jar
-    println msfragger_jar
-    println diatracer_jar
-    println diann
+    
+    println ionquant_jar ? "IonQuant is available" : "IonQuant is not available"
+    println msfragger_jar ? "MSFragger is available" : "MSFragger is not available"
+    println diatracer_jar ? "DiaTracer is available" : "DiaTracer is not available"
+    println diann ? "DIA-NN is available" : "DIA-NN is not available"
 
     if (!ionquant_jar || !msfragger_jar || !diatracer_jar || params.config_tools_update){
         println "Config tools are not available (IonQuant, MSFragger, DiaTracer)."

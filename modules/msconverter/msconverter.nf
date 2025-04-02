@@ -67,9 +67,9 @@ process MSCONVERTER {
         extension="\${file##*.}"
         filename_no_ext="\${file%.\$extension}"
 
-        #mywine msconvert $input_file --32 --zlib --filter "peakPicking true 1-" --filter "zeroSamples removeExtra" --outfile \${filename_no_ext}.mzML
+        mywine msconvert $input_file --32 --zlib --filter "peakPicking true 1-" --filter "zeroSamples removeExtra" --outfile \${filename_no_ext}.mzML
         
-        echo "asdasd text to file" > \${filename_no_ext}.mzML
+        #echo "asdasd text to file" > \${filename_no_ext}.mzML
     done
 
     MSCONVERTER_OUTPUT_DIR="${launchDir}/output/msconverter"

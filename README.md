@@ -139,13 +139,19 @@ TODO: describe the output formats, the log files for each and every process in t
 
 ## Parameters
 Parameters are accesible through the *nextflow.config* file. Additionally, every parameter can be added during execution e.g. *--input_folder*.
-**Mandatory parameters:*
-|Parameter|Types|Description|
-|-------------|-----|-----------|
+**Mandatory parameters:**
+|Parameters|Types|Description|
+|-----------------|-----|-----------|
 |```--input_folder```|*string*|Folder containing the input files with the specified name conventions LINK|
 |```--mode```|*string*|Data aqcuisition mode (DDA, DIA, TMT)|
-|```--workflow```|*string*|Name of one of the pre-defined workflow available in FragPipe (https://fragpipe.nesvilab.org/docs/tutorial_fragpipe_workflows.html)|
+|```--workflow```|*string*|Name of one of the pre-defined [workflow available in FragPipe](https://fragpipe.nesvilab.org/docs/tutorial_fragpipe_workflows.html)|
 |```--fasta_file```|*string*|Path to fasta_file location OR UniProt ID of reference proteome.|
+
+**MSConverter parameters:**
+Parameter|Types|Description|
+|---------|-----|-----------|
+|```--raw_file_type```|*string*|Extension of raw files used. *Default: .raw*|
+|```--batch_size```|*integer*|Number of files handled by MSConverter in one job. Use this parameter to set the number of jobs started for raw file conversion. E.g. Batches of 10 for 100 files will start 10 parallel jobs.|
 
 **Optional FragPipe parameters:**
 |Parameter|Types|Description|
@@ -158,15 +164,15 @@ Parameters are accesible through the *nextflow.config* file. Additionally, every
 **Sub-workflow switch parameters:**
 |Parameter|Types|Description|
 |---------|-----|-----------|
-|```--disable_msconverter```|*boolean*|Turn on-off the sub-workflow MSConverter|
+|```--disable_msconvert```|*boolean*|Turn on-off the sub-workflow MSConverter|
 |```--disable_fragpipe```|*boolean*|Turn on-off the sub-workflow FragPipe|
 |```--disable_fp_analyst```|*boolean*|Turn on-off the sub-workflow FragPipe-Analyst|
 
 **Config tools parameters:**
 |Parameter|Types|Description|
 |---------|-----|-----------|
-|```config_tools_update```|*boolean*|Force download of all config tools.|
-|```diann_download```|*string*|Url link to DIA-NN release (If blank '' built-in DIA-NN will be used)|
+|```--config_tools_update```|*boolean*|Force download of all config tools.|
+|```--diann_download```|*string*|Url link to DIA-NN release (If blank ```''```, then built-in DIA-NN will be used)|
 
 **FragPipe-Analyst parameters:**
 |Parameter|Types|Description|
@@ -179,7 +185,7 @@ Parameters are accesible through the *nextflow.config* file. Additionally, every
 
 -----
 
-## Individual Sub-Workflows
+## Individual Sub-Workflow Description
 ### MSConverter
 adas
 ### FragPipe
@@ -191,8 +197,10 @@ run only fragpipe anal
 ## References
 - FragPipe
 - FragPipe-Analyst
-- Ionquant, MSFragger, diaTracer
-- DIA-NN
+- Ionquant, MSFragger, diaTracer\
+MSFragger: ultrafast and comprehensive peptide identification in mass spectrometry-based proteomics. Nat Methods 14:513 (2017)
+- DIA-NN\
+Demichev et al, Nature Methods, 2020, https://www.nature.com/articles/s41592-019-0638-x
 
 ## Authors
 <ins>Istvan Szepesi-Nagy</ins>(1,6), Roberta Borosta(1,7), Zoltan Szabo(2), Gabor Tusnady(3), Lorinc Pongor(4), Gergely Rona(1,5)

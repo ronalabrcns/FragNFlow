@@ -19,15 +19,16 @@ database_dir=$launchDir/data/database
     
     else
         echo Checking decoys in $input_fasta
+        if [ ! -d \$database_dir ]; then
+                mkdir -p \$database_dir
+        
+        fi
         if grep -q $decoy_tag $input_fasta; then
             cat $input_fasta > \$database_dir/reference_proteome_decoy.fasta
             echo "Decoys found in the fasta file, proceeding"
         else
             echo "Decoys not found in the fasta file, adding decoys"
             
-            if [ ! -d \$database_dir ]; then
-                mkdir -p \$database_dir
-            fi
             cp $input_fasta \$database_dir/reference_proteome.fasta
             cd \$database_dir
             philosopher workspace --init
