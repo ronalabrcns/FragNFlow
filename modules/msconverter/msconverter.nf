@@ -15,18 +15,25 @@ process FILELIST {
 process MSCONVERTER_FOLDER {
     input:
         val filelist
+        path raw_input_folder
 
     output:
         env 'msconverter_folder'
     script:
     """
     msconverter_folder="${launchDir}/output/msconverter"
+
+    while [[ "\$(ls "\$msconverter_folder" | grep .mzML | wc -l)" != "\$(ls "$raw_input_folder" | grep .raw | wc -l)" ]]; do
+        echo "Waiting for msconverter to finish..."
+        sleep 1
+    done
+    echo "All converted files moved successfully."
     """
 }
 
 process MSCONVERTER {
     //clusterOptions '--account=sznistvan', '--job-name=nf-conv', '--partition=all'
-    publishDir "output/msconverter", mode: 'move', override: true
+    publishDir "output/msconverter", mode: 'move'
     container 'proteowizard/pwiz-skyline-i-agree-to-the-vendor-licenses'
     containerOptions '--cleanenv --bind $PWD:/data --writable-tmpfs'
     input:
@@ -74,5 +81,22 @@ process MSCONVERTER {
 
     MSCONVERTER_OUTPUT_DIR="${launchDir}/output/msconverter"
     
+    """
+}
+
+process CHECK_CONVERT_SUCCESS{
+    input:
+        path raw_input_folder
+        path msconverter_output_dir
+
+    output:
+        val true
+
+    script:
+    """
+    while [[ "\$(ls "$msconverter_output_dir" | grep -c .mzML)" -eq "\$(ls "$raw_input_folder" | grep -c .raw)" ]]; do
+        echo "Waiting for msconverter to finish..."
+        sleep 1
+    done
     """
 }

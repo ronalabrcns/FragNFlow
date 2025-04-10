@@ -9,10 +9,10 @@
 >[Installation](#installation)
 >> [Prerequisite: Nextflow](#prerequisite-nextflow)
 
->[FragFlow Analysis](#fragflow-analysis)
+>[Running FragFlow](#fragflow-analysis)
 >> [1. Preparing input files](#1-preparing-input-files)\
 >> [2. Configuration](#2-configuration)\
->> [3. Running FragFlow](#3-running-fragflow)\
+>> [3. Starting FragFlow](#3-running-fragflow)\
 >> [4. Config Tools Download](#4-config-tools-download)\
 >> [5. Notes on DIA-NN version](#5-notes-on-dia-nn-version)\
 >> [6. Outputs](#outputs)
@@ -31,7 +31,15 @@
 ### Introduction
 lorem ipsum
 
-### Workflow
+### Workflow and overview
+TODO: mi a fő lényeg\
+bullet pointok\
+This workflow will do the following:
+- manifest ....
+- workflow
+- "The pipeline also contains .... DATABASE..."
+- gradually tömd a libát!
+
 ![image](./workflow.png)
 **Figure 1. - Overview of FragFlow.** The workflow is composed of five sub-workflows: **manifest** file generation part creates the first input file based on a specified folder, with an optional MS raw file conversion step; **database** module downloads the reference proteome and augments them with decoy sequences; a **workflow** module which defines the desired analysis mode provided by FP; **FragPipe** module performs the actual MS analysis; **FragPipe-Analyst** module conducts the downstream post-processing analysis. Our workflow supports all predefined FragPipe analysis modes (FragPipe workflows) as well as custom user-defined configurations.
 
@@ -39,7 +47,7 @@ lorem ipsum
 
 ## Installation
 ### Prerequisite: Nextflow
-The only requirement is the installation of Nextflow, which can be easily performed using their self-installing package. For detailed instructions, refer to the official [Nextflow Installation Guide](https://www.nextflow.io/docs/latest/install.html).
+The only requirement is the installation of Nextflow, which can be easily performed using their self-installing package. **(All other requrisrements are already pre-packed into Docker containers!...)** For detailed instructions, refer to the official [Nextflow Installation Guide](https://www.nextflow.io/docs/latest/install.html).
 To install Nextflow simpy run:
 ``` 
 curl -s https://get.nextflow.io | bash
@@ -56,7 +64,7 @@ Then, verify the installation:
 nextflow -version
 ```
 
-## FragFlow Analysis
+## Runnning/Using FragFlow
 ### 1. Preparing input files
 By default ```.raw``` and ```.mzML``` mass spectrometry files are supported. Other file types may also be used - please refer to the [MSConverter sub-workflow](#msconverter) for compatibility details.\
 **File naming convention:**
@@ -80,7 +88,7 @@ Ensure that your input files are named correctly to prevent processing errors.
 ### 2. Configuration
 Input parameters can be defined in multiple ways:
 - **A. Modifying the ```nextflow.config``` file**
-    - Recommended only when pulling the repository.
+    - Recommended only when pulling this repository.
     - Allows setting default configurations for the workflow.
 - **B. Using custom config file (```<your_file>.<yml/json>```)**
     - Definie parameters in ```YAML``` or ```JSON``` format.
@@ -101,6 +109,7 @@ nextflow run sznistvan/nf-fphpc \
     --mode "DDA" \
     --fasta_file "UP000005640"
 ```
+**Further details please check Nextflow's documentation on hierarchy parameter settings... LINK**
 **Mandatory parameters:**
 To successfully execute FragFlow, the following parameters must be specified:
 - ```--input_folder``` - Path to the input folder
@@ -112,23 +121,25 @@ For more details see the [Parameters](#parameters) section
 
 ### 3. Running FragFlow
 When runnning FragFlow, all output files will be generated into the current working directory. If executing multiple analysis, **ensure that you are in the correct directory before starting the workflow!**\
+\
 **Basic execution**
 ``` 
 nextflow run sznistvan/nf-fphpc
 ```
-**Running as a background process**
+**Running as a background process**\
 For long-runnning analysis, it is recommended to start FragFlow as a background process. This allows uninterrupted execution even if the terminal session is closed (similar to *nohup*). To do so, use the ```-bg``` option and redircet the ouptut to a log file:
 ```
 nextflow run sznistvan/nf-fphpc -bg > fragflow.log
 ```
 This ensures that the process continues running while logs are stored in fragflow.log for monitoring.
 
-To cancel a running FragFlow analysis, first identify the process pid using ```ps``` or alternatively check the ```.nextflow.pid``` to ```kill``` the process. More information on [background execution](https://www.nextflow.io/docs/latest/cli.html#execution-as-a-background-job).
-### 4. Config Tools Download
-To enable user-friendly execution, the download process of MSFragger, diaTracer, and IonQuant tools are also automated. For the initial analysis, all config tools will be downloaded keeping all necessary licensing directives nice. 
+To cancel FragFlow, first identify the process pid using ```ps``` or alternatively check the ```.nextflow.pid``` to ```kill``` the process. More information on [background execution](https://www.nextflow.io/docs/latest/cli.html#execution-as-a-background-job).
+### 4. Downloading licensed FragPipe components (config tools)
+TODO: 3 components need academic licensing aggreement to work with\
+To enable user-friendly execution, the download process of config tools (MSFragger, diaTracer, and IonQuant) tools are also automated. For the initial analysis, all config tools will be downloaded keeping all necessary licensing directives nice. 
 
 ### 5. Notes on DIA-NN version
-Currently FragPipe supports DIA-NN version 1.8.2beta. With FragFlow, similarly to the GUI version of FP, users can add custom versions of DIA-NN to use. https://github.com/vdemichev/DiaNN/releases/latest
+Currently FragPipe supports DIA-NN version 1.8.2beta. With FragFlow, (no need:similarly to the GUI version of FP), users can add custom versions of DIA-NN to use. https://github.com/vdemichev/DiaNN/releases/latest
 Define the download link to the *Linux* version of any DIA-NN release using the ```--diann_download``` parameter.\
 *Note: currently when using MSBooster, the newer versions of DIA-NN does not run successfully. For this reason, when specifying newer version of DIA-NN (1.8.2+), the newer version will only be used during the DIA-NN analysis. Additionally, current changes in newer DIA-NN modules, can raise errors in FP, which will be eventually handled by FP developers in future releases. This does not effect the results generated by FragFlow.*
 
@@ -185,7 +196,7 @@ Parameter|Types|Description|
 
 -----
 
-## Individual Sub-Workflow Description
+## Detaild description of individual sub-workflows
 ### MSConverter
 adas
 ### FragPipe

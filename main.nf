@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 
 // Parameters these can be fetched into a yaml file later!
 
-include { MSCONVERTER; MSCONVERTER_FOLDER } from './modules/msconverter/msconverter.nf'
+include { MSCONVERTER; MSCONVERTER_FOLDER; CHECK_CONVERT_SUCCESS } from './modules/msconverter/msconverter.nf'
 include { MANIFEST } from './modules/headless_setup/annotation.nf'
 include { DATABASE } from './modules/headless_setup/database.nf'
 include { WORKFLOW_DB } from './modules/headless_setup/workflow.nf'
@@ -93,9 +93,10 @@ workflow MSCONVERTER_WF{
         // TODO: collect all the outputs .out.collect()
         // emit output from subworkflow
         //MSCONVERTER_FOLDER(MSCONVERTER.out().collect())
-        MSCONVERTER_FOLDER(MSCONVERTER.out.flatten().collect())
+        MSCONVERTER_FOLDER(MSCONVERTER.out.flatten().collect(), params.input_folder)
 
         MSCONVERTER_FOLDER.out.view{folder -> "The MSconverter output folder path is: $folder"}
+
     emit:
         MSCONVERTER_FOLDER.out
 }
