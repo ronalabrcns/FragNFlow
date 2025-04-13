@@ -5,6 +5,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 #library(limma)
 library(FragPipeAnalystR)
+library(ggplot2)
 print("Libraries loaded")
 
 print(args[1])
@@ -12,12 +13,14 @@ print(args[2])
 print(args[3])
 print(args[5])
 print(args[6])
+print(args[7])
 projectDir = args[1]
 experiment_annotation = args[2]
 protein_table = args[3]
 mode = args[4]
 params_gene_list = unlist(strsplit(args[5], ","))
 plot_mode = args[6]
+go_database = args[7]
 
 print(params_gene_list)
 print(typeof(experiment_annotation))
@@ -69,7 +72,8 @@ print(plot_mode)
 protein_list <- c("Q4KMQ2", "P15559", "A1L0T0", "A0FGR8", "A0JLT2", "O00754", "O14514")
 gene_list <- c("ESYT2", "MED19", "UHRF1BP1L", "SHTN1", "SLC22A23", "MEX3A", "ILVBL")
 
-params_gene_list <- c()
+#params_gene_list <- c("O00442", "O00567")
+#TODO check if its in the list of genes or proteins
 
 if (length(params_gene_list) != 0) {
 	seq_indices <- seq(1, length(params_gene_list)+1, by = 6)
@@ -85,6 +89,12 @@ if (length(params_gene_list) != 0) {
 		}
 	})
 }
+
+or_result_up <- or_test(de_data_rejections, database = go_database, direction = "UP")
+or_result_down <- or_test(de_data_rejections, database = go_database, direction = "DOWN")
+
+plot_or(or_result_up) + ggtitle("Upregulated")
+plot_or(or_result_down) + ggtitle("Downregulated")
 
 print(de_data@elementMetadata@listData)
 table_data <- de_data@elementMetadata@listData

@@ -49,14 +49,18 @@ process FP_ANALYST{
     publishDir "output", mode: 'copy'
     
     container 'sznistvan/fp-anal-hpc:latest'
+    //containerOptions '--cleanenv --bind $HOME/.config,$p_table_folder:/folder --writable-tmpfs'
 
     input:
         val experiment_annotation
         val protein_table
+        val experiment_folder
+        val p_table_folder
         val mode
         val gene_list
         val plot_mode
         val analyst_mode
+        val go_database
 
     output:
         path 'fp_analyst'
@@ -69,6 +73,7 @@ process FP_ANALYST{
     if [[ \$selected_mode == "DDA" ]]; then
         selected_mode="LFQ"
     fi
+    head $protein_table
     Rscript $projectDir/templates/fp_analyst.r $projectDir \
                                             $experiment_annotation \
                                             $protein_table \
@@ -76,7 +81,8 @@ process FP_ANALYST{
                                             '${gene_list.join(",")}' \
                                             $plot_mode \
                                             fp_analyst \
-                                            \${PWD}
+                                            \${PWD} \
+                                            $go_database
     """
 
     //Ez mukodik: singularity exec --cleanenv --bind /home/rona/sznistvan/Nextflow/nf-fphpc/data/singularity/test:/test fp-analyst-test.sif Rscript test/rtest.r

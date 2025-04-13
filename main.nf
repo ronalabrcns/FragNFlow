@@ -169,9 +169,11 @@ workflow FP_ANALYST_WF{
         mode
         gene_list
         plot_mode
+        analyst_mode
+        go_database
 
     main:
-        FP_ANALYST(experiment, prot_table, mode, gene_list, plot_mode)    
+        FP_ANALYST(experiment, prot_table, mode, gene_list, plot_mode, analyst_mode, go_database)    
 
 }
 
@@ -217,7 +219,8 @@ workflow {
             FP_ANALYST_WF(FRAGPIPE_WF.out[0], FRAGPIPE_WF.out[1], mode, params.gene_list, params.plot_mode, params.analyst_mode)
         }
         else{
-            FP_ANALYST_WF(params.experiment, params.prot_table, mode, params.gene_list, params.plot_mode, params.analyst_mode)
+            println file(params.p_table).parent
+            FP_ANALYST_WF(params.experiment, params.p_table, mode, params.gene_list, params.plot_mode, params.analyst_mode)
         }    
     }
 }
