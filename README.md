@@ -57,7 +57,7 @@ Move nextflow into an executable folder and add to ```PATH```:
 mkdir -p $HOME/.local/bin/
 mv nextflow $HOME/.local/bin/
 
-export PATH="PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
 ```
 Then, verify the installation:
 ```
@@ -66,16 +66,16 @@ nextflow -version
 
 ## Runnning/Using FragFlow
 ### 1. Preparing input files
-By default ```.raw``` and ```.mzML``` mass spectrometry files are supported. Other file types may also be used - please refer to the [MSConverter sub-workflow](#msconverter) for compatibility details.\
+By default ```.raw``` and ```.mzML``` mass spectrometry files are supported. Other file types may also be used - please refer to the [MSConverter sub-workflow](#msconverter){:target="_blank"} for compatibility details.\
 **File naming convention:**
 Input files should follow FragPipe's manifest generation guidelines. Please prepare the input files using the format: 
 ```
 <filename>_<experiment>_<bioreplicate>_<mode>.raw
 ```
-- filename - Original aw MS file name
+- filename - Original raw MS file name
 - experiment - Group, experiment, or treatment identifier of the sample (can be text, number, or left empty)
 - bioreplicate - Numerical identifier of a sample (can be number, or left empty)
-- mode - Aqcuisition mode used in FragPipe (options: DDA, DDA+, DIA, DIA-Quant, or DIA-lib)
+- mode - Aqcuisition mode used in FragPipe (options: DDA, DDA+, DIA, DIA-Quant, DIA-lib or left empty)
 
 **Examples filenames:** 
 - ```filename_control_1_DDA.mzML```
@@ -90,6 +90,11 @@ Input parameters can be defined in multiple ways:
 - **A. Modifying the ```nextflow.config``` file**
     - Recommended only when pulling this repository.
     - Allows setting default configurations for the workflow.
+    - Example configuration is ```nextflow.config.example```, copy it to ```nextflow.config``` before editing:
+```
+cp nextflow.config.example nextflow.config
+```
+
 - **B. Using custom config file (```<your_file>.<yml/json>```)**
     - Definie parameters in ```YAML``` or ```JSON``` format.
     - Specify the config file when running Nextflow:
