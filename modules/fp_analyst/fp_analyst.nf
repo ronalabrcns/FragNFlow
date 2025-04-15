@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2 
 
 process COLLECT_FP_ANALYST_FILES{
-    publishDir "output/fp_analyst", mode: 'move'
+    publishDir "output/fp_analyst", mode: 'copy'
 
     input:
         path output_folder_fragpipe
@@ -53,9 +53,7 @@ process FP_ANALYST{
 
     input:
         val experiment_annotation
-        val protein_table
-        val experiment_folder
-        val p_table_folder
+        val p_table
         val mode
         val gene_list
         val plot_mode
@@ -73,16 +71,17 @@ process FP_ANALYST{
     if [[ \$selected_mode == "DDA" ]]; then
         selected_mode="LFQ"
     fi
-    head $protein_table
-    Rscript $projectDir/templates/fp_analyst.r $projectDir \
+    
+    Rscript $projectDir/templates/fp_analyst.r \
                                             $experiment_annotation \
-                                            $protein_table \
+                                            $p_table \
                                             \$selected_mode \
                                             '${gene_list.join(",")}' \
+                                            $analyst_mode \
                                             $plot_mode \
+                                            $go_database \
                                             fp_analyst \
-                                            \${PWD} \
-                                            $go_database
+                                            \${PWD}
     """
 
     //Ez mukodik: singularity exec --cleanenv --bind /home/rona/sznistvan/Nextflow/nf-fphpc/data/singularity/test:/test fp-analyst-test.sif Rscript test/rtest.r

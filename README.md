@@ -47,7 +47,7 @@ This workflow will do the following:
 
 ## Installation
 ### Prerequisite: Nextflow
-The only requirement is the installation of Nextflow, which can be easily performed using their self-installing package. **(All other requrisrements are already pre-packed into Docker containers!...)** For detailed instructions, refer to the official [Nextflow Installation Guide](https://www.nextflow.io/docs/latest/install.html).
+The only requirement is the installation of Nextflow, which can be easily performed using their self-installing package. **(All other requrisrements are already pre-packed into Docker containers!...)** For detailed instructions, refer to the official <a href="https://www.nextflow.io/docs/latest/install.html" target="_blank">Nextflow Installation Guide</a>.
 To install Nextflow simpy run:
 ``` 
 curl -s https://get.nextflow.io | bash
@@ -57,7 +57,7 @@ Move nextflow into an executable folder and add to ```PATH```:
 mkdir -p $HOME/.local/bin/
 mv nextflow $HOME/.local/bin/
 
-export PATH="PATH:$HOME/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
 ```
 Then, verify the installation:
 ```
@@ -72,10 +72,10 @@ Input files should follow FragPipe's manifest generation guidelines. Please prep
 ```
 <filename>_<experiment>_<bioreplicate>_<mode>.raw
 ```
-- filename - Original aw MS file name
+- filename - Original raw MS file name
 - experiment - Group, experiment, or treatment identifier of the sample (can be text, number, or left empty)
 - bioreplicate - Numerical identifier of a sample (can be number, or left empty)
-- mode - Aqcuisition mode used in FragPipe (options: DDA, DDA+, DIA, DIA-Quant, or DIA-lib)
+- mode - Aqcuisition mode used in FragPipe (options: DDA, DDA+, DIA, DIA-Quant, DIA-lib or left empty)
 
 **Examples filenames:** 
 - ```filename_control_1_DDA.mzML```
@@ -90,18 +90,22 @@ Input parameters can be defined in multiple ways:
 - **A. Modifying the ```nextflow.config``` file**
     - Recommended only when pulling this repository.
     - Allows setting default configurations for the workflow.
+    - Example configuration is ```nextflow.config.example```, copy it to ```nextflow.config``` before editing:
+```
+cp nextflow.config.example nextflow.config
+```
 - **B. Using custom config file (```<your_file>.<yml/json>```)**
     - Definie parameters in ```YAML``` or ```JSON``` format.
     - Specify the config file when running Nextflow:
-    - Refer to Nextflow's documentation on [parameter files](https://www.nextflow.io/docs/latest/cli.html#pipeline-parameters)
+    - Refer to Nextflow's documentation on <a href="https://www.nextflow.io/docs/latest/cli.html#pipeline-parameters" target="_blank">parameter files</a>
 ```
-nextflow run sznistvan/nf-fphpc -params-file my_parameters.yml
+nextflow run ronalabrcns/FragFlow -params-file my_parameters.yml
 ```
 - **C. Defining parameters in the command line**
     - Recommended for quick and flexible excecution
     - Example command:
 ```
-nextflow run sznistvan/nf-fphpc \
+nextflow run ronalabrcns/FragFlow \
     --input_folder "/path/to/input/folder" \
     --ram 32 \
     --threads 16 \
@@ -133,13 +137,13 @@ nextflow run sznistvan/nf-fphpc -bg > fragflow.log
 ```
 This ensures that the process continues running while logs are stored in fragflow.log for monitoring.
 
-To cancel FragFlow, first identify the process pid using ```ps``` or alternatively check the ```.nextflow.pid``` to ```kill``` the process. More information on [background execution](https://www.nextflow.io/docs/latest/cli.html#execution-as-a-background-job).
+To cancel FragFlow, first identify the process pid using ```ps``` or alternatively check the ```.nextflow.pid``` to ```kill``` the process. More information on <a href="https://www.nextflow.io/docs/latest/cli.html#execution-as-a-background-job" target="_blank">background execution</a>.
 ### 4. Downloading licensed FragPipe components (config tools)
 TODO: 3 components need academic licensing aggreement to work with\
 To enable user-friendly execution, the download process of config tools (MSFragger, diaTracer, and IonQuant) tools are also automated. For the initial analysis, all config tools will be downloaded keeping all necessary licensing directives nice. 
 
 ### 5. Notes on DIA-NN version
-Currently FragPipe supports DIA-NN version 1.8.2beta. With FragFlow, (no need:similarly to the GUI version of FP), users can add custom versions of DIA-NN to use. https://github.com/vdemichev/DiaNN/releases/latest
+Currently FragPipe supports DIA-NN version 1.8.2beta. With FragFlow, (no need:similarly to the GUI version of FP), users can add custom versions of DIA-NN to use. See latest release at: <a href="https://github.com/vdemichev/DiaNN/releases/latest" target="_blank"> *DIA-NN: latest* </a>
 Define the download link to the *Linux* version of any DIA-NN release using the ```--diann_download``` parameter.\
 *Note: currently when using MSBooster, the newer versions of DIA-NN does not run successfully. For this reason, when specifying newer version of DIA-NN (1.8.2+), the newer version will only be used during the DIA-NN analysis. Additionally, current changes in newer DIA-NN modules, can raise errors in FP, which will be eventually handled by FP developers in future releases. This does not effect the results generated by FragFlow.*
 
@@ -155,7 +159,7 @@ Parameters are accesible through the *nextflow.config* file. Additionally, every
 |-----------------|-----|-----------|
 |```--input_folder```|*string*|Folder containing the input files with the specified name conventions LINK|
 |```--mode```|*string*|Data aqcuisition mode (DDA, DIA, TMT)|
-|```--workflow```|*string*|Name of one of the pre-defined [workflow available in FragPipe](https://fragpipe.nesvilab.org/docs/tutorial_fragpipe_workflows.html)|
+|```--workflow```|*string*|Name of one of the pre-defined <a href="https://fragpipe.nesvilab.org/docs/tutorial_fragpipe_workflows.html" target="_blank"> workflow available in FragPipe</a>|
 |```--fasta_file```|*string*|Path to fasta_file location OR UniProt ID of reference proteome.|
 
 **MSConverter parameters:**
@@ -193,6 +197,7 @@ Parameter|Types|Description|
 |```--analyst_mode```|*string*|Analysis mode of FragPipe-Analyst. Available modes: "protein" OR "peptide".|
 |```--gene_list```|*string list*|List of strings containing gene/protein names, used for the boxplot generation for comparisions.|
 |```--plot_mode```|*string*|Vizualization mode used in FragPipe-Analyst, for the volcano plots and comparative boxplots. Available modes: "gene" OR "protein"|
+|```--gene_set_database```|*string*| Select from two possibilities of databases for GSEA: ["Hallmark", "KEGG"]|
 
 -----
 

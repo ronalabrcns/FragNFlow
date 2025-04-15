@@ -52,14 +52,14 @@ process FRAGPIPE{
         sed -i "s/^diann.run-dia-nn=true/diann.run-dia-nn=false/" "${launchDir}/data/workflow/selected_workflow_db.workflow"
 
         echo "Running FragPipe with new version of DIA-NN"
-        /fragpipe_bin/fragPipe-\$fp_version/fragpipe/bin/fragpipe --headless \
+        /fragpipe_bin/fragPipe-\$fp_version/fragpipe/bin/fragpipe --headless --ram $ram --threads $threads \
         --workflow "${launchDir}/data/workflow/selected_workflow_db.workflow" \
         --manifest "${launchDir}/data/manifest/generated_manifest.fp-manifest" \
         --workdir "output_folder_fragpipe" \
         --config-tools-folder "${projectDir}/config_tools" \
         || true
 
-        /fragpipe_bin/fragPipe-\$fp_version/fragpipe/bin/fragpipe --headless \
+        /fragpipe_bin/fragPipe-\$fp_version/fragpipe/bin/fragpipe --headless --ram $ram --threads $threads \
         --workflow "${launchDir}/data/workflow/diann.workflow" \
         --manifest "${launchDir}/data/manifest/generated_manifest.fp-manifest" \
         --workdir "output_folder_fragpipe" \
@@ -68,12 +68,11 @@ process FRAGPIPE{
         || true
     else
         echo "Running FragPipe"
-        /fragpipe_bin/fragPipe-\$fp_version/fragpipe/bin/fragpipe --headless \
+        /fragpipe_bin/fragPipe-\$fp_version/fragpipe/bin/fragpipe --headless --ram $ram --threads $threads \
         --workflow "${launchDir}/data/workflow/selected_workflow_db.workflow" \
         --manifest "${launchDir}/data/manifest/generated_manifest.fp-manifest" \
         --workdir "output_folder_fragpipe" \
         --config-tools-folder "${projectDir}/config_tools" \
-        --config-python /usr/bin/python3 \
         || true
     fi
 

@@ -134,7 +134,6 @@ workflow FRAGPIPE_WF{
     take:
         config_tools
         input_folder
-        output_folder
         mode
         workflow
         fasta_file
@@ -182,7 +181,6 @@ workflow {
     input_folder = Channel.of(params.input_folder)
     raw_file_type = Channel.of(params.raw_file_type)
     batch_size = Channel.of(params.batch_size)
-    output_folder = Channel.fromPath(params.output_folder)
     mode = Channel.of(params.mode)
     workflow = Channel.of(params.workflow)
     fasta_file = Channel.fromPath(params.fasta_file)
@@ -204,23 +202,23 @@ workflow {
         //TODO: add if else for msconverter part
         //input_folder = the params input_folder OR the output of msconverter
         if (params.disable_msconvert){
-            FRAGPIPE_WF(CONFIG_TOOLS_WF.out, input_folder, output_folder, 
+            FRAGPIPE_WF(CONFIG_TOOLS_WF.out, input_folder, 
                     mode, workflow, fasta_file, 
                     decoy_tag, threads, ram, params.diann_download, params.analyst_mode)
         }
         else{
-            FRAGPIPE_WF(CONFIG_TOOLS_WF.out, MSCONVERTER_WF.out, output_folder, 
+            FRAGPIPE_WF(CONFIG_TOOLS_WF.out, MSCONVERTER_WF.out, 
                         mode, workflow, fasta_file, 
                         decoy_tag, threads, ram, params.diann_download, params.analyst_mode)
         }
     }
     if (!params.disable_fp_analyst){
         if (!params.disable_fragpipe){
-            FP_ANALYST_WF(FRAGPIPE_WF.out[0], FRAGPIPE_WF.out[1], mode, params.gene_list, params.plot_mode, params.analyst_mode)
+            FP_ANALYST_WF(FRAGPIPE_WF.out[0], FRAGPIPE_WF.out[1], mode, params.gene_list, params.plot_mode, params.analyst_mode, params.go_database)
         }
         else{
             println file(params.p_table).parent
-            FP_ANALYST_WF(params.experiment, params.p_table, mode, params.gene_list, params.plot_mode, params.analyst_mode)
+            FP_ANALYST_WF(params.experiment, params.p_table, mode, params.gene_list, params.plot_mode, params.analyst_mode, params.go_database)
         }    
     }
 }

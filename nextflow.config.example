@@ -1,0 +1,84 @@
+
+
+//*************************
+//****PARAMETERS***********
+//*************************
+params.input_folder = 'path/to/input/folder'
+params.raw_file_type = 'raw'
+params.batch_size = 10
+
+params.ram = 8
+params.threads = 16
+params.workflow = 'LFQ-MBR'
+params.mode = 'DDA'
+params.fasta_file = 'path/to/fasta/file.fasta' //path to fasta or UniProt ID
+params.decoy_tag = 'rev_'
+params.db_split = 1
+
+//Turn ON/OFF SubWorkflows
+//false - ACTIVE        TODO
+//true - DISABLED
+params.disable_msconvert = false
+params.disable_fragpipe = false
+params.disable_fp_analyst = true
+
+//Add DIA-NN download link https://github.com/vdemichev/DiaNN/releases/latest
+//When blank, the FragPipe included version will be used
+params.diann_download = 'https://github.com/vdemichev/DiaNN/releases/download/2.0/DIA-NN-2.0.1-Academia-Linux.zip'
+
+//Force update on all config tools (IonQuant, MSFragger, diaTracer, DIA-NN)
+params.config_tools_update = false
+
+//FragPipe-Analyst parameters
+params.experiment = "/path/to/file/experiment_annotation.tsv"    //manually created
+params.p_table = "/path/to/file/combined_protein.tsv"         //manually created
+params.analyst_mode = "protein"                                                                                //protein or peptide
+params.gene_list = ["Q4KMQ2", "A0FGR8"]                                                                         //TODO
+params.plot_mode = "gene"
+params.go_database = "Hallmark"                                                                                 //HALLMARK or KEGG          
+//*************************
+//**SINGULARITY SETTINGS***
+//*************************
+singularity {
+    enabled = true
+
+    cacheDir = 'data/singularity'
+
+    runOptions = "--cleanenv --bind $PWD,$HOME/.config,${params.input_folder},${launchDir},${projectDir},${params.experiment},${params.p_table}"
+    
+    withName:DATAfBASE {
+        runOptions = "--cleanenv --bind $PWD"
+    }
+
+    withName:PULLMSCONVERTER {
+        runOptions = "--cleanenv --bind ${projectDir}/${workDir}/mountdata:/data --writable-tmpfs"
+    }
+
+    withName:FRAGPfIPE {
+        //runOptions = "--cleanenv --bind $PWD"
+        runOptions = "--cleanenv --bind $PWD,$HOME/.config,${params.input_folder},${launchDir}/data/database/,${launchDir}/data/workflow/,${launchDir}"
+    }
+}
+
+
+executor.perCpuMemAllocation = true
+
+//*************************
+//**PROCESS SETTINGS*******
+//*************************
+process {
+    withName:MSCONVERTER {
+        cpus = 4
+        memory = 16.GB
+        executor = 'slurm'
+    }
+    withName:DATABASE{
+        executor = 'local'
+    }
+    withName:FRAGPIPE{
+        executor = 'slurm'
+        cpus = 16
+        memory = 64.GB
+    }
+    executor='local'
+}

@@ -11,26 +11,31 @@ print("Libraries loaded")
 print(args[1])
 print(args[2])
 print(args[3])
+print(args[4])
 print(args[5])
 print(args[6])
 print(args[7])
-projectDir = args[1]
-experiment_annotation = args[2]
-protein_table = args[3]
-mode = args[4]
-params_gene_list = unlist(strsplit(args[5], ","))
+print(args[8])
+print(args[9])
+#projectDir = args[1]
+experiment_annotation = args[1]
+p_table = args[2]
+mode = args[3]
+params_gene_list = unlist(strsplit(args[4], ","))
+analyst_mode = args[5]
 plot_mode = args[6]
 go_database = args[7]
+output_dir = args[8]
 
 print(params_gene_list)
 print(typeof(experiment_annotation))
-print(typeof(protein_table))
+print(typeof(p_table))
 
 
-data <- make_se_from_files(protein_table, experiment_annotation,
-							type = mode, level = "protein")
+data <- make_se_from_files(p_table, experiment_annotation,
+							type = mode, level = analyst_mode)
 
-pdf(file=paste(args[8], "/", args[7],"/output.pdf", sep=""), width = 10, height = 7, pointsize = 14, title = "FragPipe-Analyst Report")
+pdf(file=paste(args[9], "/", output_dir,"/output.pdf", sep=""), width = 10, height = 7, pointsize = 14, title = "FragPipe-Analyst Report")
 par(mar=c(15, 15, 15, 35))
 
 print(data)
@@ -53,17 +58,43 @@ print(contrast_txt)
 cond <- strsplit(contrast_txt, " ")
 print(cond)
 
-if (plot_mode == "protein") {
-  plot_mode <- "Protein.ID"
-} else if (plot_mode == "gene") {
-  plot_mode <- "Gene"
+print(de_data@elementMetadata@listData)
+table_data <- de_data@elementMetadata@listData
+df <- as.data.frame(table_data)
+head(df)
+write.csv(df, paste(args[9], "/",output_dir,"/output.csv", sep=""), row.names = F)
+
+if (mode != "DIA") {
+	if (plot_mode == "protein") {
+		plot_mode <- "Protein.ID"
+		params_gene_list <- params_gene_list[params_gene_list %in% df$Protein.ID]
+	} else if (plot_mode == "gene") {
+		plot_mode <- "Gene"
+		params_gene_list <- params_gene_list[params_gene_list %in% df$Gene]
+	} else {
+		plot_mode <- "Protein.ID"
+		params_gene_list <- c()
+	}
 } else {
-  plot_mode <- "Protein.ID"
+	if (plot_mode == "protein") {
+		plot_mode <- "ID"
+		params_gene_list <- params_gene_list[params_gene_list %in% df$ID]
+	} else if (plot_mode == "gene") {
+		plot_mode <- "Genes"
+		params_gene_list <- params_gene_list[params_gene_list %in% df$Gene]
+	} else {
+		plot_mode <- "ID"
+		params_gene_list <- c()
+	}
 }
+#TODO: based on mode plot_mode column selection is different!!!
 
 plot_cvs(de_data_rejections)
 
-plot_volcano(de_data_rejections, cond[[1]][3], name_col = plot_mode)
+print(de_data_rejections)
+print("Volcano plot")
+
+plot_volcano(de_data_rejections, cond[[1]][3], name_col = plot_mode, add_names = F)
 
 print(de_data_rejections$p.value)
 
@@ -71,9 +102,6 @@ print(plot_mode)
 #TODOOOOOO
 protein_list <- c("Q4KMQ2", "P15559", "A1L0T0", "A0FGR8", "A0JLT2", "O00754", "O14514")
 gene_list <- c("ESYT2", "MED19", "UHRF1BP1L", "SHTN1", "SLC22A23", "MEX3A", "ILVBL")
-
-#params_gene_list <- c("O00442", "O00567")
-#TODO check if its in the list of genes or proteins
 
 if (length(params_gene_list) != 0) {
 	seq_indices <- seq(1, length(params_gene_list)+1, by = 6)
@@ -96,13 +124,6 @@ or_result_down <- or_test(de_data_rejections, database = go_database, direction 
 plot_or(or_result_up) + ggtitle("Upregulated")
 plot_or(or_result_down) + ggtitle("Downregulated")
 
-print(de_data@elementMetadata@listData)
-table_data <- de_data@elementMetadata@listData
-df <- as.data.frame(table_data)
-head(df)
-write.csv(df, paste(args[8], "/",args[7],"/output.csv", sep=""), row.names = F)
-
 dev.off()
 
-
-print("Hello container")
+print("FragPipe-Analyst Report finished successfully.")
