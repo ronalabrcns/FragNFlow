@@ -4,22 +4,22 @@
 ### **Table of contents**
 >[Introduction](#introduction)
 
->[Workflow](#workflow)
+>[Workflow](#workflow-and-overview)
 
 >[Installation](#installation)
 >> [Prerequisite: Nextflow](#prerequisite-nextflow)
 
->[Running FragFlow](#fragflow-analysis)
+>[Using FragFlow](#using-fragflow)
 >> [1. Preparing input files](#1-preparing-input-files)\
 >> [2. Configuration](#2-configuration)\
 >> [3. Starting FragFlow](#3-running-fragflow)\
->> [4. Config Tools Download](#4-config-tools-download)\
+>> [4. Config Tools Download](#4-downloading-licensed-fragpipe-components-config-tools)\
 >> [5. Notes on DIA-NN version](#5-notes-on-dia-nn-version)\
->> [6. Outputs](#outputs)
+>> [6. Outputs](#6-outputs)
 
 >[Parameters](#parameters)
 
->[Individual sub-workflows](#individual-sub-workflows)
+>[Individual modules](#detailed-description-of-individual-modules)
 >>[MSConverter](#msconverter)\
 >>[FragPipe](#fragpipe)\
 >>[FragPipe-Analyst](#fragpipe-analyst)
@@ -29,19 +29,33 @@
 >[Authors](#authors)
 
 ### Introduction
-lorem ipsum
+ <div align="justify"> Here we introduce FragFlow an open-source pipeline that integrates FragPipe (FP) with Nextflow, a powerful workflow management system, to create a scalable, reproducible, and high-performance solution for proteomic data analysis. Nextflow enhances FP by automating workflows across HPC, cloud, and cluster environments, ensuring portability and reproducibility. Our integrated pipeline also streamlines downstream analyses, including differential expression, pathway mapping, and data visualization, while maintaining the ease of deploying across diverse computing infrastructures. This work represents a significant step forward in making the FP-based state-of-the-art proteomic data analysis more accessible and efficient for the broader research community.</div>
 
 ### Workflow and overview
-TODO: mi a fő lényeg\
-bullet pointok\
-This workflow will do the following:
-- manifest ....
-- workflow
-- "The pipeline also contains .... DATABASE..."
-- gradually tömd a libát!
+This repository contains a Nextflow-based workflow for running FragPipe — a powerful toolkit for mass spectrometry data analysis (Figure 1).
+It supports all major data analysis modes available in FragPipe, while offering enhanced automation, and easy deployment.\
+\
+**Key Fetures**\
+This workflow simplifies MS data analysis on Unix-based systems (HPC, cloud, etc.) by:
+1. **Manifest generation:** Automatically creates a ```manifest``` FP input file based on the provided input folder.
+2. **Raw file conversion:** Optionally converts raw MS files during processing with the MSConverter module (also available as a standalone step).
+3. **Reference proteome management:**
+    - Downloads reference proteome directly from UniProt, or
+    - Utilizes a user-provided ```fasta``` file from path.
+4. **Decoy sequence handling:** Augments collected reference proteome with decoy sequences when not already present.
+5. **Workflow config:**
+    - Selects the appropriate FP workflow
+    - Integrates the reference proteome into the selected ```workflow``` file.
+6. **Configuration tool download:**
+    - Downloads required licensed config tools (MSFragger, IonQuant, diaTracer) after user information collection,
+    - Downloads user-defined version of DIA-NN (optional)
+    - Fully complies with FP's licensing terms.
+7. **FragPipe Executions:** Runs the desired FP analysis workflow (also available standalone).
+8. **FragPipe-Analyst Integration:** Optionally runs FP-Analyst for quick statistical DE result predictions (also available standalone).
 
 ![image](./workflow.png)
-**Figure 1. - Overview of FragFlow.** The workflow is composed of five sub-workflows: **manifest** file generation part creates the first input file based on a specified folder, with an optional MS raw file conversion step; **database** module downloads the reference proteome and augments them with decoy sequences; a **workflow** module which defines the desired analysis mode provided by FP; **FragPipe** module performs the actual MS analysis; **FragPipe-Analyst** module conducts the downstream post-processing analysis. Our workflow supports all predefined FragPipe analysis modes (FragPipe workflows) as well as custom user-defined configurations.
+**Figure 1. - Overview of the FragFlow pipeline.**
+ <div align="justify">Overview of the FragFlow workflow, composed of six modular sub-workflows, each representing a key functionality in the automated proteomics analysis pipeline. FragFlow supports all major predefined FragPipe (FP) analysis modes as well as custom user-defined configurations. Manifest module generates the FP input manifest file from a specified directory, with optional raw file conversion. Database module downloads the appropriate reference proteome and appends decoy sequences for target-decoy analysis. Workflow module defines the FP analysis mode (e.g., LFQ, TMT, DIA) to be executed. Download module retrieves necessary licensed tools (e.g., MSFragger, IonQuant, diaTracer) in compliance with FP licensing agreements. FragPipe core module executes the main mass spectrometry analysis using the manifest and workflow configuration files. FragPipe-Analyst module performs downstream statistical analysis and visualization, generating plots such as PCA, volcano plots, and heatmaps.</div>
 
 -----
 
@@ -65,7 +79,7 @@ Then, verify the installation:
 nextflow -version
 ```
 
-## Runnning/Using FragFlow
+## Using FragFlow
 ### 1. Preparing input files
 By default ```.raw``` and ```.mzML``` mass spectrometry files are supported. Other file types may also be used - please refer to the [MSConverter sub-workflow](#msconverter){:target="_blank"} for compatibility details.\
 **File naming convention:**
@@ -204,7 +218,7 @@ Parameter|Types|Description|
 
 -----
 
-## Detaild description of individual sub-workflows
+## Detailed description of individual modules
 ### MSConverter
 adas
 ### FragPipe
