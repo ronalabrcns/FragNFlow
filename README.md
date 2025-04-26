@@ -61,7 +61,7 @@ This workflow simplifies MS data analysis on Unix-based systems (HPC, cloud, etc
 
 ## Installation
 ### Prerequisite: Nextflow
-The only requirement is the installation of Nextflow, which can be easily performed using their self-installing package. **(All other requrisrements are already pre-packed into Docker containers!...)** For detailed instructions, refer to the official <a href="https://www.nextflow.io/docs/latest/install.html" target="_blank">Nextflow Installation Guide</a>.
+The only requirement is the installation of Nextflow, which can be easily performed using their self-installing package. All other requirements are already pre-packed into Docker containers. For detailed instructions, refer to the official <a href="https://www.nextflow.io/docs/latest/install.html" target="_blank">Nextflow Installation Guide</a>.
 To install Nextflow simpy run:
 ``` 
 curl -s https://get.nextflow.io | bash
@@ -72,7 +72,6 @@ mkdir -p $HOME/.local/bin/
 mv nextflow $HOME/.local/bin/
 
 export PATH="$PATH:$HOME/.local/bin"
-export PATH="$PATH:$HOME/.local/bin"
 ```
 Then, verify the installation:
 ```
@@ -81,24 +80,22 @@ nextflow -version
 
 ## Using FragFlow
 ### 1. Preparing input files
-By default ```.raw``` and ```.mzML``` mass spectrometry files are supported. Other file types may also be used - please refer to the [MSConverter sub-workflow](#msconverter){:target="_blank"} for compatibility details.\
+By default ```.raw``` and ```.mzML``` mass spectrometry files are supported. Other file types may also be used - please refer to the [MSConverter sub-workflow](#msconverter) for compatibility details.\
 **File naming convention:**
 Input files should follow FragPipe's manifest generation guidelines. Please prepare the input files using the format: 
 ```
 <filename>_<experiment>_<bioreplicate>_<mode>.raw
 ```
 - filename - Original raw MS file name
-- filename - Original raw MS file name
 - experiment - Group, experiment, or treatment identifier of the sample (can be text, number, or left empty)
 - bioreplicate - Numerical identifier of a sample (can be number, or left empty)
-- mode - Aqcuisition mode used in FragPipe (options: DDA, DDA+, DIA, DIA-Quant, DIA-lib or left empty)
-- mode - Aqcuisition mode used in FragPipe (options: DDA, DDA+, DIA, DIA-Quant, DIA-lib or left empty)
-
+- mode - Acquisition mode used in FragPipe (options: DDA, DDA+, DIA, DIA-Quant, DIA-lib or left empty)\
+\
 **Examples filenames:** 
 - ```filename_control_1_DDA.mzML```
 - ```filename_KO_3.raw```
 - ```filename_treatment_DIA.raw```
-- ```filename_control.mzML```
+- ```file_name_control.mzML```
 
 Ensure that your input files are named correctly to prevent processing errors.
 
@@ -130,39 +127,42 @@ nextflow run ronalabrcns/FragFlow \
     --mode "DDA" \
     --fasta_file "UP000005640"
 ```
-**Further details please check Nextflow's documentation on hierarchy parameter settings... LINK**
+**For further details please check Nextflow's documentation on the [hierarchy of parameter settings](https://www.nextflow.io/docs/latest/config.html).\
+\
 **Mandatory parameters:**
 To successfully execute FragFlow, the following parameters must be specified:
 - ```--input_folder``` - Path to the input folder
-- ```--workflow``` - Selected workflow
+- ```--workflow``` - Selected FP workflow
 - ```--mode``` - Aqcuisition mode
 - ```--fasta_file```. Reference proteome *fasta* file
 
-For more details see the [Parameters](#parameters) section
+For more details on parameters please see the [Parameters](#parameters) section.
 
 ### 3. Running FragFlow
 When runnning FragFlow, all output files will be generated into the current working directory. If executing multiple analysis, **ensure that you are in the correct directory before starting the workflow!**\
 \
 **Basic execution**
 ``` 
-nextflow run sznistvan/nf-fphpc
+nextflow run ronalabrcns/FragFlow
 ```
 **Running as a background process**\
 For long-runnning analysis, it is recommended to start FragFlow as a background process. This allows uninterrupted execution even if the terminal session is closed (similar to *nohup*). To do so, use the ```-bg``` option and redircet the ouptut to a log file:
 ```
-nextflow run sznistvan/nf-fphpc -bg > fragflow.log
+nextflow run ronalabrcns/FragFlow -bg > fragflow.log
 ```
 This ensures that the process continues running while logs are stored in fragflow.log for monitoring.
 
 To cancel FragFlow, first identify the process pid using ```ps``` or alternatively check the ```.nextflow.pid``` to ```kill``` the process. More information on <a href="https://www.nextflow.io/docs/latest/cli.html#execution-as-a-background-job" target="_blank">background execution</a>.
+
 ### 4. Downloading licensed FragPipe components (config tools)
-TODO: 3 components need academic licensing aggreement to work with\
-To enable user-friendly execution, the download process of config tools (MSFragger, diaTracer, and IonQuant) tools are also automated. For the initial analysis, all config tools will be downloaded keeping all necessary licensing directives nice. 
+To enable user-friendly execution, the download process of config tools (MSFragger, diaTracer, and IonQuant) are also automated. For the initial analysis, all config tools will be downloaded into the project directory. Users are asked to provide name, institution and email address before prograssing. Also users must read and accept licensing terms of MSFragger, IonQuant, and diaTracer before downloading. Without necessary user information the download process stops. Please always keep all necessary licensing directives nice. 
+
+<div align="justify">To enable a user-friendly execution of the workflow, the download process for essential configuration tools — namely MSFragger, diaTracer, and IonQuant — has been fully automated. During the initial analysis, all required tools will be downloaded into the project directory to keep everything organized and transparent. Before proceeding with the download, users are asked to provide their name, institution, and email address. In addition, users must read and accept the licensing terms for <a href="https://msfragger-upgrader.nesvilab.org/upgrader/MSFragger-LICENSE.pdf">MSFragger</a>, <a href="https://msfragger.arsci.com/ionquant/IonQuant Academic Use License 05162022.pdf">IonQuant</a>, and <a href="https://msfragger-upgrader.nesvilab.org/diatracer/diaTracer UM %23 2024-417 Academic Research Use License 05142024.pdf">diaTracer</a>. If the necessary information is not provided, or if the licensing terms are not explicitly accepted, the download process will be halted. This procedure ensures that all licensing directives are strictly respected and maintained throughout the workflow. <b>We kindly ask all users to carefully read and honor the licensing agreements</b> to support the continued development of these essential tools.</div>
 
 ### 5. Notes on DIA-NN version
-Currently FragPipe supports DIA-NN version 1.8.2beta. With FragFlow, (no need:similarly to the GUI version of FP), users can add custom versions of DIA-NN to use. See latest release at: <a href="https://github.com/vdemichev/DiaNN/releases/latest" target="_blank"> *DIA-NN: latest* </a>
+Currently FragPipe supports DIA-NN version 1.8.2beta. With FragFlow, users can add custom versions of DIA-NN to use. See latest release at: <a href="https://github.com/vdemichev/DiaNN/releases/latest" target="_blank"> *DIA-NN: latest* </a>
 Define the download link to the *Linux* version of any DIA-NN release using the ```--diann_download``` parameter.\
-*Note: currently when using MSBooster, the newer versions of DIA-NN does not run successfully. For this reason, when specifying newer version of DIA-NN (1.8.2+), the newer version will only be used during the DIA-NN analysis. Additionally, current changes in newer DIA-NN modules, can raise errors in FP, which will be eventually handled by FP developers in future releases. This does not effect the results generated by FragFlow.*
+*Note: currently when using MSBooster, the newer versions of DIA-NN does not run successfully. For this reason, when specifying newer version of DIA-NN (1.8.2+), the newer version will only be used during the DIA-NN analysis. Additionally, current changes in newer DIA-NN modules, can raise errors in FP, which can be eventually handled by FP developers in future releases. This does not effect the results generated by FragFlow.*
 
 ### 6. Outputs
 TODO: describe the output formats, the log files for each and every process in the work/XX/hexa/nextflow.log file!...
