@@ -155,8 +155,6 @@ This ensures that the process continues running while logs are stored in fragflo
 To cancel FragFlow, first identify the process pid using ```ps``` or alternatively check the ```.nextflow.pid``` to ```kill``` the process. More information on <a href="https://www.nextflow.io/docs/latest/cli.html#execution-as-a-background-job" target="_blank">background execution</a>.
 
 ### 4. Downloading licensed FragPipe components (config tools)
-To enable user-friendly execution, the download process of config tools (MSFragger, diaTracer, and IonQuant) are also automated. For the initial analysis, all config tools will be downloaded into the project directory. Users are asked to provide name, institution and email address before prograssing. Also users must read and accept licensing terms of MSFragger, IonQuant, and diaTracer before downloading. Without necessary user information the download process stops. Please always keep all necessary licensing directives nice. 
-
 <div align="justify">To enable a user-friendly execution of the workflow, the download process for essential configuration tools — namely MSFragger, diaTracer, and IonQuant — has been fully automated. During the initial analysis, all required tools will be downloaded into the project directory to keep everything organized and transparent. Before proceeding with the download, users are asked to provide their name, institution, and email address. In addition, users must read and accept the licensing terms for <a href="https://msfragger-upgrader.nesvilab.org/upgrader/MSFragger-LICENSE.pdf">MSFragger</a>, <a href="https://msfragger.arsci.com/ionquant/IonQuant Academic Use License 05162022.pdf">IonQuant</a>, and <a href="https://msfragger-upgrader.nesvilab.org/diatracer/diaTracer UM %23 2024-417 Academic Research Use License 05142024.pdf">diaTracer</a>. If the necessary information is not provided, or if the licensing terms are not explicitly accepted, the download process will be halted. This procedure ensures that all licensing directives are strictly respected and maintained throughout the workflow. <b>We kindly ask all users to carefully read and honor the licensing agreements</b> to support the continued development of these essential tools.</div>
 
 ### 5. Notes on DIA-NN version
@@ -166,7 +164,21 @@ Define the download link to the *Linux* version of any DIA-NN release using the 
 
 ### 6. Outputs
 TODO: describe the output formats, the log files for each and every process in the work/XX/hexa/nextflow.log file!...
+<details>
+ <summary>Data folder</summary>
+ <br>
+ - manifest
+ - database
+ - workflow
+</details>
 
+<details>
+ <summary>Output folder</summary>
+ <br>
+ - MSconverter
+ - FragPipe
+ - FragPipeAnalyst
+</details>
 -----
 
 ## Parameters
@@ -228,12 +240,18 @@ run only fragpipe
 run only fragpipe anal
 
 ## References
-- FragPipe
-- FragPipe-Analyst
-- Ionquant, MSFragger, diaTracer\
-MSFragger: ultrafast and comprehensive peptide identification in mass spectrometry-based proteomics. Nat Methods 14:513 (2017)
-- DIA-NN\
-Demichev et al, Nature Methods, 2020, https://www.nature.com/articles/s41592-019-0638-x
+- FragPipe [[1](https://fragpipe.nesvilab.org/)]
+- FragPipe-Analyst [[2](https://fragpipe-analyst-doc.nesvilab.org/), [3](https://pubs.acs.org/doi/10.1021/acs.jproteome.4c00294)]
+- MSFragger [[4](https://www.nature.com/articles/nmeth.4256)], Ionquant [[5](https://www.mcponline.org/article/S1535-9476(21)00050-5/fulltext)], diaTracer[[6](https://www.nature.com/articles/s41467-024-55448-8)]
+- DIA-NN[[7](https://www.nature.com/articles/s41592-019-0638-x)]
+
+1. FragPipe Homepage
+2. FragPipe-Analyst Documentation
+3. Hsiao, Y., Zhang, H., Li, G. X., Deng, Y., Yu, F., Valipour Kahrood, H., Steele, J. R., Schittenhelm, R. B., & Nesvizhskii, A. I. (2024). Analysis and Visualization of Quantitative Proteomics Data Using FragPipe-Analyst. Journal of Proteome Research, 23(10), 4303–4315. https://doi.org/10.1021/acs.jproteome.4c00294
+4. Kong, A., Leprevost, F., Avtonomov, D. et al. MSFragger: ultrafast and comprehensive peptide identification in mass spectrometry–based proteomics. Nat Methods 14, 513–520 (2017). https://doi.org/10.1038/nmeth.4256
+5. Yu, F., Haynes, S. E., & Nesvizhskii, A. I. (2021). IonQuant Enables Accurate and Sensitive Label-Free Quantification With FDR-Controlled Match-Between-Runs. Molecular & Cellular Proteomics, 20. https://doi.org/10.1016/j.mcpro.2021.100077
+6. Li, K., Teo, G.C., Yang, K.L. et al. diaTracer enables spectrum-centric analysis of diaPASEF proteomics data. Nat Commun 16, 95 (2025). https://doi.org/10.1038/s41467-024-55448-8
+7. Demichev, V., Messner, C.B., Vernardis, S.I. et al. DIA-NN: neural networks and interference correction enable deep proteome coverage in high throughput. Nat Methods 17, 41–44 (2020). https://doi.org/10.1038/s41592-019-0638-x
 
 ## Authors
 <ins>Istvan Szepesi-Nagy</ins>(1,6), Roberta Borosta(1,7), Zoltan Szabo(2), Gabor Tusnady(3), Lorinc Pongor(4), Gergely Rona(1,5)
