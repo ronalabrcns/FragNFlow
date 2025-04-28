@@ -104,9 +104,9 @@ Input parameters can be defined in multiple ways:
 - **A. Modifying the ```nextflow.config``` file**
     - Recommended only when pulling this repository.
     - Allows setting default configurations for the workflow.
-    - Example configuration is ```nextflow.config.example```, copy it to ```nextflow.config``` before editing:
+    - Example configuration is ```nextflow_example.config```, copy it and modify accordingly:
 ```
-cp nextflow.config.example nextflow.config
+cp nextflow_example.config nextflow.config
 ```
 - **B. Using custom config file (```<your_file>.<yml/json>```)**
     - Definie parameters in ```YAML``` or ```JSON``` format.
@@ -256,13 +256,27 @@ Parameter|Types|Description|
 -----
 
 ## Detailed description of individual modules
+Three modules can be run independently in standalone mode: MSConverter, FragPipe, and FP-Analyst. Each module can be enabled or disabled using parameters described above.\
+Below is a detailed description of each module:
 ### MSConverter
-adas
+The MSConverter module handles raw mass spectrometry (MS) file conversion. We provide an MSConverter Docker container for in-place data conversion, optimized for FragPipe compatibility. Supported input formats include ```.raw``` and ```.wiff``` files, and batch conversion of multiple files is supported. Converted ```.mzML``` files are saved into the ```output/msconverter/``` folder. When FragPipe is enabled, it uses this converted data, and the input path is automatically adjusted.\
+>For more details on file conversion, refer to the [FragPipe documentation](https://fragpipe.nesvilab.org/docs/tutorial_convert.html).
+
 ### FragPipe
-run only fragpipe
+The FragPipe module executes the main analysis pipeline. Only two mandatory input files are required: a manifest and a workflow. FragPipe runs the analysis and outputs results into the output/fragpipe/ folder. We support fully customized analyses by allowing users to supply their own manifest and workflow files.\
+>If you're new to FragFlow, we strongly encourage checking out FragPipe’s [tutorials](https://fragpipe.nesvilab.org/docs/tutorial_fragpipe.html) and detailed explanations of its [workflow](https://fragpipe.nesvilab.org/docs/tutorial_fragpipe_workflows.html) modes.
+
+When FP-Analyst is enabled, key output files (e.g., experiment annotation and protein/peptide TSV files) are automatically copied to the input location for FP-Analyst.
 
 ### FragPipe-Analyst
-run only fragpipe anal
+FragFlow also support the standalone execution of FragPipe-Analyst, for quick, on cluster execution of quality measurements and differential expression analysis. This way a quick first impulse can be seen by the data. However for more in depth analysis and lighter user experience the FragPipe-Analyst Shiny web app is highly recommended and appreciated. Our FP-Analyst module outputs a resulting csv file with all DE analysis results and a PDF file report with all the necessary plots and figures. 
+
+FP-Analyst can also be executed independently for fast, on-cluster quality assessment and differential expression analysis. This provides a quick initial overview of the data on the spot.\
+The FP-Analyst module produces:
+* A CSV file containing all differential expression (DE) results.
+* A PDF report with all relevant plots and figures.
+
+>For deeper exploration and an improved user experience, we highly recommend using the [FragPipe-Analyst](http://fragpipe-analyst.nesvilab.org/) Shiny web app.
 
 ## References
 - FragPipe [[1](https://fragpipe.nesvilab.org/)]
@@ -279,12 +293,13 @@ run only fragpipe anal
 7. Demichev, V., Messner, C.B., Vernardis, S.I. et al. DIA-NN: neural networks and interference correction enable deep proteome coverage in high throughput. Nat Methods 17, 41–44 (2020). https://doi.org/10.1038/s41592-019-0638-x
 
 ## Authors
-<ins>Istvan Szepesi-Nagy</ins>(1,6), Roberta Borosta(1,7), Zoltan Szabo(2), Gabor Tusnady(3), Lorinc Pongor(4), Gergely Rona(1,5)
+<ins>Istvan Szepesi-Nagy</ins>(1,7), Roberta Borosta(1,8), Zoltan Szabo(2), Gabor Tusnady(3,4), Lorinc Pongor(5), Gergely Rona(1,6)
 
 1. DNA Repair Research Group, Institute of Molecular Life Sciences, HUN-REN Research Centre for Natural Sciences, Budapest, HU
 2. Department of Medical Chemistry, Albert Szent-Györgyi Medical School, University of Szeged, Szeged, HU
 3. Proteomics Bioinformatics Research Group, Institute of Molecular Life Sciences, HUN-REN Research Centre for Natural Sciences, Budapest, HU
-4. Cancer Genomics and Epigenetics Core Group, Hungarian Centre of Excellence for Molecular Medicine (HCEMM), Szeged, HU
-5. Department of Biochemistry and Molecular Pharmacology, NYU Grossman School of Medicine, NY, USA
-6. Semmelweis University Doctoral School, Budapest, HU
-7. Doctoral School of Biology, ELTE Eötvös Loránd University, Budapest, HU
+4. Department of Bioinformatics, Semmelweis University, Budapest, HU
+5. Cancer Genomics and Epigenetics Core Group, Hungarian Centre of Excellence for Molecular Medicine (HCEMM), Szeged, HU
+6. Department of Biochemistry and Molecular Pharmacology, NYU Grossman School of Medicine, NY, USA
+7. Semmelweis University Doctoral School, Budapest, HU
+8. Doctoral School of Biology, ELTE Eötvös Loránd University, Budapest, HU
