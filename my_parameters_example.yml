@@ -1,0 +1,12 @@
+---
+
+input_folder: 'path/to/input/folder'
+ram: 16
+threads: 8
+workflow: 'LFQ-MBR'
+mode: 'DDA'
+fasta_file: 'path/to/fasta.fasta'
+
+disable_msconvert: true
+disable_fragpipe: false
+disable_fp_analyst: true
