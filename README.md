@@ -103,17 +103,24 @@ Ensure that your input files are named correctly to prevent processing errors.
 Input parameters can be defined in multiple ways:
 - **A. Modifying the ```nextflow.config``` file**
     - Recommended only when pulling this repository.
-    - Allows setting default configurations for the workflow.
-    - Example configuration is ```nextflow_example.config```, copy it and modify accordingly:
-```
-cp nextflow_example.config nextflow.config
-```
-- **B. Using custom config file (```<your_file>.<yml/json>```)**
-    - Definie parameters in ```YAML``` or ```JSON``` format.
+    - Allows setting default configurations for the workflow locally.
+    - Example configuration is ```nextflow.config```,  modify parameters according to [Parameters](#parameters):
+> *Note: By default Nextflow needs a ```nextflow.config``` file present in the project directory, if changing this do not rename otherwise parameters not initialized.*
+
+- **B. Using custom config file (```<your_file>.config```)**
+    - Definie parameters and global options in a custom config format.
     - Specify the config file when running Nextflow:
-    - Refer to Nextflow's documentation on <a href="https://www.nextflow.io/docs/latest/cli.html#pipeline-parameters" target="_blank">parameter files</a>
+    - Ideal to launch FragFlow from link.
+    - Refer to Nextflow's documentation on <a href="https://www.nextflow.io/docs/latest/config.html" target="_blank">configuration files</a>
 ```
-nextflow run ronalabrcns/FragFlow -params-file my_parameters.yml
+nextflow run ronalabrcns/FragFlow -c custom_config_example.config
+```
+> *Note: Custom config files are ideal for parameter file definitions and also for global process settings, see example below.*
+```
+params.input_folder = 'my/path/to/input/folder'
+params.workflow = 'LFQ-MBR'
+params.mode = 'DDA'
+params.fasta_file = 'path/to/fasta/file.fasta'
 ```
 - **C. Defining parameters in the command line**
     - Recommended for quick and flexible excecution
@@ -145,6 +152,22 @@ When runnning FragFlow, all output files will be generated into the current work
 ``` 
 nextflow run ronalabrcns/FragFlow
 ```
+\
+**Defining Executors for FragFlow**\
+In Nextflow, **executors** are the components that determine the system where a process is run and supervises the execution. Such executors include AWS, Azure Batch, SLURM etc. Please refer to Nextflow's documentation on [available executors](https://www.nextflow.io/docs/latest/executor.html).\
+To define SLURM options in FragFlow please define options in the ```nextflow.config``` or the custom ```example.config``` files. The ```clusterOptions``` is used to define additional available [```sbatch``` options](https://slurm.schedmd.com/sbatch.html) to the process.
+```
+process{
+    withName:FRAGPIPE{
+        executor = 'slurm'
+        memory = 32.GB
+        cpus = 16
+        time = '5h'
+        clusterOptions = '--account="myuser"'
+    }
+}
+```
+\
 **Running as a background process**\
 For long-runnning analysis, it is recommended to start FragFlow as a background process. This allows uninterrupted execution even if the terminal session is closed (similar to *nohup*). To do so, use the ```-bg``` option and redircet the ouptut to a log file:
 ```
