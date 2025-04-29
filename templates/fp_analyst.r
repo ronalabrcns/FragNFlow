@@ -43,9 +43,14 @@ print("")
 
 print(colData(data)$condition)
 
-imputed_data <- manual_impute(data)
+if (mode == "TMT"){
+	data[is.na(data)] <- 0
+	imputed_data <- data
+} else {
+	imputed_data <- manual_impute(data)
+	plot_feature_numbers(imputed_data)
+}
 
-plot_feature_numbers(imputed_data)
 plot_pca(imputed_data)
 plot_correlation_heatmap(imputed_data)
 
@@ -64,10 +69,35 @@ df <- as.data.frame(table_data)
 head(df)
 write.csv(df, paste(args[9], "/",output_dir,"/output.csv", sep=""), row.names = F)
 
+# get_column_name <- function(mode, plot_mode) {
+#   if (mode == "DIA") {
+#     if (plot_mode == "protein") return("ID")
+#     if (plot_mode == "gene") return("Genes")
+#     return("ID")
+#   } else if (mode == "TMT") {
+#     if (plot_mode == "protein") return("Protein.ID")
+#     if (plot_mode == "gene") return("Index")
+#     return("Protein.ID")
+#   } else {
+#     if (plot_mode == "protein") return("Protein.ID")
+#     if (plot_mode == "gene") return("Gene")
+#     return("Protein.ID")
+#   }
+# }
+
+# col_name <- get_column_name(mode, plot_mode)
+# plot_mode <- col_name
+# params_gene_list <- if (col_name %in% colnames(df)) {
+#   params_gene_list[params_gene_list %in% df[[col_name]]]
+# } else {
+#   c()
+# }
+
+
 if (mode != "DIA") {
 	if (plot_mode == "protein") {
-		plot_mode <- "Protein.ID"
-		params_gene_list <- params_gene_list[params_gene_list %in% df$Protein.ID]
+		plot_mode <- "ProteinID"
+		params_gene_list <- params_gene_list[params_gene_list %in% df$ProteinID]
 	} else if (plot_mode == "gene") {
 		plot_mode <- "Gene"
 		params_gene_list <- params_gene_list[params_gene_list %in% df$Gene]
@@ -94,7 +124,7 @@ plot_cvs(de_data_rejections)
 print(de_data_rejections)
 print("Volcano plot")
 
-plot_volcano(de_data_rejections, cond[[1]][3], name_col = plot_mode, add_names = F)
+plot_volcano(de_data_rejections, cond[[1]][3], name_col = plot_mode, add_names = T)
 
 print(de_data_rejections$p.value)
 
@@ -121,8 +151,21 @@ if (length(params_gene_list) != 0) {
 or_result_up <- or_test(de_data_rejections, database = go_database, direction = "UP")
 or_result_down <- or_test(de_data_rejections, database = go_database, direction = "DOWN")
 
+print("GO enrichment analysis plots")
 plot_or(or_result_up) + ggtitle("Upregulated")
 plot_or(or_result_down) + ggtitle("Downregulated")
+
+# pdf(file=paste(args[9], "/", output_dir,"/gsea_output.pdf", sep=""), width = 10, height = 10, pointsize = 11, title = "GSEA Report")
+# plot_or(or_result_up) + ggtitle("Upregulated") +  theme(
+#     axis.title = element_text(size = 16),      # Axis titles
+#     axis.text = element_text(size = 14),       # Axis tick labels
+#     legend.title = element_text(size = 14),    # Legend title
+#     legend.text = element_text(size = 12))
+# plot_or(or_result_down) + ggtitle("Downregulated") +  theme(
+#     axis.title = element_text(size = 16),      # Axis titles
+#     axis.text = element_text(size = 14),       # Axis tick labels
+#     legend.title = element_text(size = 14),    # Legend title
+#     legend.text = element_text(size = 12))
 
 dev.off()
 

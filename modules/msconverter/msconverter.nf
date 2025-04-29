@@ -27,6 +27,12 @@ process MSCONVERTER_FOLDER {
         echo "Waiting for msconverter to finish..."
         sleep 1
     done
+
+    if [ -f ${raw_input_folder}/*annotation.txt ]; then
+        echo "Annotation file found, moving to msconverter folder."
+        cp ${raw_input_folder}/*annotation.txt \${msconverter_folder}/
+    fi
+
     echo "All converted files moved successfully."
     """
 }

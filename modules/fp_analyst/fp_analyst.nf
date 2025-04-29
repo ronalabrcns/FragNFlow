@@ -31,9 +31,9 @@ process COLLECT_FP_ANALYST_FILES{
     elif [[ $mode == "TMT" ]]; then
         #TODO "experiment_annotation.tsv"
         if [[ $analyst_mode == "peptide" ]]; then
-            cat \$out_fp_dir/abundance_peptide_MD.tsv > p_table.tsv
+            cat \$out_fp_dir/tmt-report/abundance_peptide_MD.tsv > p_table.tsv
         else
-            cat \$out_fp_dir/abundance_gene_MD.tsv > p_table.tsv
+            cat \$out_fp_dir/tmt-report/abundance_gene_MD.tsv > p_table.tsv
         fi
     elif [[ $mode == "DIA" ]]; then
         if [[ $analyst_mode == "peptide" ]]; then
@@ -46,7 +46,7 @@ process COLLECT_FP_ANALYST_FILES{
 }
 
 process FP_ANALYST{
-    publishDir "output", mode: 'copy'
+    publishDir "output", mode: 'copy', overwrite: true
     
     container 'sznistvan/fp-anal-hpc:latest'
     //containerOptions '--cleanenv --bind $HOME/.config,$p_table_folder:/folder --writable-tmpfs'
