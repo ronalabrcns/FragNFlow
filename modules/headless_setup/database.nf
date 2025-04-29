@@ -12,7 +12,6 @@ process DATABASE{
 
     output:
         val true
-    //   path 'reference_proteome_decoy.fasta'
 
     script:
         template 'database.sh'

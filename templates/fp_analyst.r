@@ -155,18 +155,6 @@ print("GO enrichment analysis plots")
 plot_or(or_result_up) + ggtitle("Upregulated")
 plot_or(or_result_down) + ggtitle("Downregulated")
 
-# pdf(file=paste(args[9], "/", output_dir,"/gsea_output.pdf", sep=""), width = 10, height = 10, pointsize = 11, title = "GSEA Report")
-# plot_or(or_result_up) + ggtitle("Upregulated") +  theme(
-#     axis.title = element_text(size = 16),      # Axis titles
-#     axis.text = element_text(size = 14),       # Axis tick labels
-#     legend.title = element_text(size = 14),    # Legend title
-#     legend.text = element_text(size = 12))
-# plot_or(or_result_down) + ggtitle("Downregulated") +  theme(
-#     axis.title = element_text(size = 16),      # Axis titles
-#     axis.text = element_text(size = 14),       # Axis tick labels
-#     legend.title = element_text(size = 14),    # Legend title
-#     legend.text = element_text(size = 12))
-
 dev.off()
 
 print("FragPipe-Analyst Report finished successfully.")

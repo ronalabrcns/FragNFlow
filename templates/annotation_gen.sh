@@ -1,14 +1,19 @@
 
-#input_folder_workflow='/home/rona/sznistvan/FragPipeHPC/TestFP_HPC/test_data/converted_mzML_FXS_test_2/'
-#mode="DDA"
-# Define list of valid dataTypes (case-insensitive)
+#============================================================
+# Script: annotation_gen.sh 
+# Goal: Script to generate a manifest file from input files
+# Used by: annotation.nf
+# Parameters: global params used from annotation.nf
+#============================================================
+
+# Define list of valid dataTypes (case-insensitive) used by FP
 valid_data_types=("DDA" "DDA+" "DIA" "DIA-Quant" "DIA-Lib")
 
-input_folder_workflow="${1%/}"  # Remove trailing slash if present
+input_folder_workflow="${1%/}" 
 
 ls $input_folder_workflow
 
-# Loop through all mzML files in the input folder
+# Processing each file in the input folder
 for file in "$input_folder_workflow"/*; do
     extension="${file##*.}"
     echo $extension
@@ -24,22 +29,23 @@ for file in "$input_folder_workflow"/*; do
     # Split the filename by underscores into an array
     IFS='_' read -r -a parts <<< "$filename_no_ext"
 
-    # Extract the last part to determine dataType, bioreplicate, or experiment
+    # Extracting the last part; used to determine dataType, bioreplicate, or experiment later
     last_part="${parts[-1]}"
 
+    # Parsing name convention (non-TMT)
     if [[ $2 != "TMT" ]]; then
 
         if [[ ${#parts[@]} -gt 1 ]]; then
-            # Check if last_part matches a valid dataType TODO!!
+            # Check if last_part matches a valid dataType
             if [[ "${valid_data_types[@]}" =~ "$last_part" ]]; then
                 dataType="$last_part"
                 if [[ "${parts[-2]}" =~ ^[0-9]+$ ]]; then
-                    # If second-to-last part is a number, it's bioreplicate
+                    # If second-to-last part is a number, then it's bioreplicate
                     bioreplicate="${parts[-2]}"
                     if [[ ${#parts[@]} > 3 ]]; then
                         experiment="${parts[-3]}"
                     else
-                        # If only two parts, treat the experiment blank
+                        # If only two parts --> blank
                         experiment=""
                     fi
                 else
@@ -53,7 +59,7 @@ for file in "$input_folder_workflow"/*; do
                 experiment="${parts[-2]}"  # Second-to-last part is experiment
                 dataType=""
             else
-                # If last part is not a number or valid dataType, it's experiment
+                # If last part is not a number or valid dataType, then it's experiment
                 experiment="$last_part"
                 bioreplicate=""
                 dataType=""
@@ -69,10 +75,7 @@ for file in "$input_folder_workflow"/*; do
             experiment="${parts[-2]}"
         fi
 
-        # Extract sample (everything before bioreplicate and experiment)
-        #sample="$(echo "${parts[@]:0:${#parts[@]}-3}" | tr ' ' '_')"  # Everything before bioreplicate and experiment
-
-        # Use params.mode if dataType is missing
+        # Use params.mode if dataType is empty, defined in annotation.nf
         dataType="${dataType:-$2}"
 
         # Ensure we have at least a valid dataType
@@ -81,12 +84,12 @@ for file in "$input_folder_workflow"/*; do
             continue
         fi
     else
-        # If TMT is specified, set dataType to TMT
+        # TMT annotation empty
         dataType=""
         experiment=""
         bioreplicate=""
     fi
-    # Append extracted values to the manifest file (keep correct tab spacing)
+    # Append extracted values to the manifest file
     echo -e "$file\t${experiment:-}\t${bioreplicate:-}\t$dataType" >> generated_manifest.fp-manifest
 done
 

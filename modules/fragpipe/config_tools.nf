@@ -31,7 +31,6 @@ process IONQUANT_DOWNLOAD{
 
     output:
         path 'IonQuant-*.jar'
-        //path 'LICENSE_ionquant.pdf'
     script:
         """
         NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/ionquant/latest_version.php)
@@ -65,7 +64,6 @@ process MSFRAGGER_DOWNLOAD{
         val update
 
     output:
-        //path 'msfragger.zip'
         path 'msfragger'
 
     script:
@@ -106,7 +104,6 @@ process DIATRACER_DOWNLOAD{
 
     output:
         path 'diaTracer-*.jar'
-        //path 'LICENSE_diatracer.pdf'
 
     script:
         """

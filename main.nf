@@ -1,7 +1,18 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-// Parameters these can be fetched into a yaml file later!
+/*
+=========================================================================================
+ FragFlow: Automated Workflow for Large-Scale Quantitative Proteomics in HPC Environments
+-----------------------------------------------------------------------------------------
+ Description :   Main workflow for executing FragFlow. Change parameters in the config file.
+ Author      :   Istvan Szepesi-Nagy (szepesi-nagy.istvan@ttk.hu)
+ Created     :   2024-04-29
+ Version     :   v1.0.0
+ Repository  :   https://github.com/ronalabrcns/FragFlow
+ License     :   MIT
+==========================================================================================
+*/
 
 include { MSCONVERTER; MSCONVERTER_FOLDER; CHECK_CONVERT_SUCCESS } from './modules/msconverter/msconverter.nf'
 include { MANIFEST } from './modules/headless_setup/annotation.nf'
@@ -22,9 +33,7 @@ def additionMSFraggerLicensingInformationIonQuant(){
 }
 
 def addDownloadInformation(){
-    // Read the download information from the user
-    //ionquant_jar = file(projectDir + '/config_tools/IonQuant-?.jar').exists()
-
+    // Stdin download information from the user
     def configToolsDir = new File(projectDir.toFile(), 'config_tools')
 
     ionquant_jar = configToolsDir.list({ dir, name -> name.startsWith("IonQuant-") && name.endsWith(".jar") })?.length > 0
@@ -32,7 +41,6 @@ def addDownloadInformation(){
     diatracer_jar = configToolsDir.list({ dir, name -> name.startsWith("diaTracer-") && name.endsWith(".jar") })?.length > 0
     diann = file(projectDir + '/config_tools/diann').isDirectory()
 
-    
     println ionquant_jar ? "IonQuant is available" : "IonQuant is not available"
     println msfragger_jar ? "MSFragger is available" : "MSFragger is not available"
     println diatracer_jar ? "DiaTracer is available" : "DiaTracer is not available"
@@ -70,29 +78,18 @@ def addDownloadInformation(){
     }
 }
 
-// MSConverter sub-workflow LATER
+// MSConverter sub-workflow
 workflow MSCONVERTER_WF{
-    // Define the processes and their order
-    //PULLMSCONVERTER()
     take:
         raw_file_type
         batch_size
 
     main:
-        // if (raw_file_type == "raw" || raw_file_type == ""){
-        //     ch_input_file = Channel.fromPath("${params.input_folder}/*.raw").buffer(size:params.batch_size, remainder:true)
-        // }
-        // else{
-        //     ch_input_file = Channel.fromPath("${params.input_folder}/*.${raw_file_type}").buffer(size:params.batch_size, remainder:true)
-        // }
         ch_input_file = Channel.fromPath("${params.input_folder}/*.raw").buffer(size:params.batch_size, remainder:true)
         MSCONVERTER(ch_input_file)
 
         MSCONVERTER.out.flatten().collect().view {c -> "Msconverter output: $c"}
 
-        // TODO: collect all the outputs .out.collect()
-        // emit output from subworkflow
-        //MSCONVERTER_FOLDER(MSCONVERTER.out().collect())
         MSCONVERTER_FOLDER(MSCONVERTER.out.flatten().collect(), params.input_folder)
 
         MSCONVERTER_FOLDER.out.view{folder -> "The MSconverter output folder path is: $folder"}
@@ -101,7 +98,7 @@ workflow MSCONVERTER_WF{
         MSCONVERTER_FOLDER.out
 }
 
-// FragPipe sub-workflows
+// Config Tools sub-workflow
 workflow CONFIG_TOOLS_WF{
     take:
         name
@@ -129,7 +126,7 @@ workflow CONFIG_TOOLS_WF{
     emit:
         CHECK_DEPENDENCY.out
 }
-
+// FragPipe sub-workflow
 workflow FRAGPIPE_WF{
     take:
         config_tools
@@ -150,7 +147,7 @@ workflow FRAGPIPE_WF{
 
         WORKFLOW_DB(DATABASE.out, workflow, decoy_tag)
 
-        FRAGPIPE(config_tools, MANIFEST.out, WORKFLOW_DB.out[0], WORKFLOW_DB.out[1], ram, threads, mode, diann_download)   //out out out to wait for all other processes to finish
+        FRAGPIPE(config_tools, MANIFEST.out, WORKFLOW_DB.out[0], WORKFLOW_DB.out[1], ram, threads, mode, diann_download)
 
         COLLECT_FP_ANALYST_FILES(FRAGPIPE.out, mode, analyst_mode)
 
@@ -161,7 +158,6 @@ workflow FRAGPIPE_WF{
 
 // FPAnalyst sub-workflow
 workflow FP_ANALYST_WF{
-    // Define the processes and their order
     take:
         experiment
         prot_table
@@ -199,8 +195,7 @@ workflow {
         CONFIG_TOOLS_WF(download_name, download_email, download_institution, license_accept,
                     ionquant_jar, msfragger_jar, diatracer_jar, diann, params.diann_download, 
                     params.config_tools_update)
-        //TODO: add if else for msconverter part
-        //input_folder = the params input_folder OR the output of msconverter
+   
         if (params.disable_msconvert){
             FRAGPIPE_WF(CONFIG_TOOLS_WF.out, input_folder, 
                     mode, workflow, fasta_file, 

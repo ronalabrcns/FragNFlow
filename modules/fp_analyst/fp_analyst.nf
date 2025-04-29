@@ -1,6 +1,10 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2 
 
+//====================================================
+// FragPipe Analyst process
+//====================================================
+
 process COLLECT_FP_ANALYST_FILES{
     publishDir "output/fp_analyst", mode: 'copy'
 
@@ -46,10 +50,9 @@ process COLLECT_FP_ANALYST_FILES{
 }
 
 process FP_ANALYST{
-    publishDir "output", mode: 'copy', overwrite: true
+    publishDir "output", mode: 'copy', overwrite: false
     
     container 'sznistvan/fp-anal-hpc:latest'
-    //containerOptions '--cleanenv --bind $HOME/.config,$p_table_folder:/folder --writable-tmpfs'
 
     input:
         val experiment_annotation
@@ -83,6 +86,4 @@ process FP_ANALYST{
                                             fp_analyst \
                                             \${PWD}
     """
-
-    //Ez mukodik: singularity exec --cleanenv --bind /home/rona/sznistvan/Nextflow/nf-fphpc/data/singularity/test:/test fp-analyst-test.sif Rscript test/rtest.r
 }
