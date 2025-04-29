@@ -5,4 +5,3 @@ data/
 
 .nextflow*
 .update-timestamp
-nextflow.config
