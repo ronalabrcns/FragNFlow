@@ -3,13 +3,13 @@ nextflow.enable.dsl=2
 
 /*
 =========================================================================================
- FragFlow: Automated Workflow for Large-Scale Quantitative Proteomics in HPC Environments
+ Frag'n'Flow: Automated Workflow for Large-Scale Quantitative Proteomics in HPC Environments
 -----------------------------------------------------------------------------------------
- Description :   Main workflow for executing FragFlow. Change parameters in the config file.
+ Description :   Main workflow for executing Frag'n'Flow. Change parameters in the config file.
  Author      :   Istvan Szepesi-Nagy (szepesi-nagy.istvan@ttk.hu)
  Created     :   2024-04-29
  Version     :   v1.0.0
- Repository  :   https://github.com/ronalabrcns/FragFlow
+ Repository  :   https://github.com/ronalabrcns/FragNFlow
  License     :   MIT
 ==========================================================================================
 */
@@ -18,7 +18,7 @@ include { MSCONVERTER; MSCONVERTER_FOLDER; CHECK_CONVERT_SUCCESS } from './modul
 include { MANIFEST } from './modules/headless_setup/annotation.nf'
 include { DATABASE } from './modules/headless_setup/database.nf'
 include { WORKFLOW_DB } from './modules/headless_setup/workflow.nf'
-include { IONQUANT_DOWNLOAD; MSFRAGGER_DOWNLOAD; DIATRACER_DOWNLOAD; DIANN_DOWNLOAD; CHECK_DEPENDENCY } from './modules/fragpipe/config_tools.nf'
+include { AUTHENTICATE; IONQUANT_DOWNLOAD; MSFRAGGER_DOWNLOAD; DIATRACER_DOWNLOAD; DIANN_DOWNLOAD; CHECK_DEPENDENCY } from './modules/fragpipe/config_tools.nf'
 include { FRAGPIPE } from './modules/fragpipe/fragpipe.nf'
 include { FP_ANALYST; COLLECT_FP_ANALYST_FILES } from './modules/fp_analyst/fp_analyst.nf'
 
@@ -36,21 +36,23 @@ def addDownloadInformation(){
     // Stdin download information from the user
     def configToolsDir = new File(projectDir.toFile(), 'config_tools')
 
-    ionquant_jar = configToolsDir.list({ dir, name -> name.startsWith("IonQuant-") && name.endsWith(".jar") })?.length > 0
+    ionquant_jar = file(projectDir + '/config_tools/ionquant/').isDirectory()
     msfragger_jar = file(projectDir + '/config_tools/msfragger/').isDirectory()
-    diatracer_jar = configToolsDir.list({ dir, name -> name.startsWith("diaTracer-") && name.endsWith(".jar") })?.length > 0
+    diatracer_jar = file(projectDir + '/config_tools/diatracer/').isDirectory()
     diann = file(projectDir + '/config_tools/diann').isDirectory()
 
-    println ionquant_jar ? "IonQuant is available" : "IonQuant is not available"
-    println msfragger_jar ? "MSFragger is available" : "MSFragger is not available"
-    println diatracer_jar ? "DiaTracer is available" : "DiaTracer is not available"
-    println diann ? "DIA-NN is available" : "DIA-NN is not available"
+    println ionquant_jar ? "${GREEN}IonQuant is available" : "${RED}IonQuant is not available"
+    println msfragger_jar ? "${GREEN}MSFragger is available" : "${RED}MSFragger is not available"
+    println diatracer_jar ? "${GREEN}DiaTracer is available" : "${RED}DiaTracer is not available"
+    println diann ? "${GREEN}DIA-NN is available" : "${RED}DIA-NN is not available"
 
     if (!ionquant_jar || !msfragger_jar || !diatracer_jar || params.config_tools_update){
         println "Config tools are not available (IonQuant, MSFragger, DiaTracer)."
         println "PLEASE ENTER THE CONTACT INFORMATION TO DOWNLOAD:"
-        println "Name:"
-        download_name = System.in.newReader().readLine()
+        println "First Name:"
+        download_first_name = System.in.newReader().readLine()
+        println "Last Name:"
+        download_last_name = System.in.newReader().readLine()
         println "\nEmail:"
         download_email = System.in.newReader().readLine()
         println "\nInstitution:"
@@ -78,6 +80,14 @@ def addDownloadInformation(){
     }
 }
 
+def token(input){
+    println "Authentication code:"
+    def token = System.in.newReader().readLine()
+    println "Token: $token"
+
+    return token
+}
+
 // MSConverter sub-workflow
 workflow MSCONVERTER_WF{
     take:
@@ -98,13 +108,24 @@ workflow MSCONVERTER_WF{
         MSCONVERTER_FOLDER.out
 }
 
-// Config Tools sub-workflow
-workflow CONFIG_TOOLS_WF{
+workflow AUTHENTICATION{
     take:
-        name
+        first_name
+        last_name
         email
         institution
         license
+
+    main:
+        AUTHENTICATE(first_name, last_name, email, institution, license)
+    emit:
+        AUTHENTICATE.out
+}
+
+// Config Tools sub-workflow
+workflow CONFIG_TOOLS_WF{
+    take:
+        token
         ionquant
         msfragger
         diatracer
@@ -113,18 +134,22 @@ workflow CONFIG_TOOLS_WF{
         update
 
     main:
-        IONQUANT_DOWNLOAD(ionquant, name, email, institution, license, update)
-        MSFRAGGER_DOWNLOAD(msfragger, name, email, institution, license, update)
-        DIATRACER_DOWNLOAD(diatracer, name, email, institution, license, update)
+        //AUTHENTICATE(first_name, last_name, email, institution, license)
+        //TODO: add a seprate sub-workflow for the authentication
+        // After that we can call the token read input function in the main workflow
+        //Continueu with this worklfow with tool downloads!
+
+        IONQUANT_DOWNLOAD(ionquant, token, update)
+        MSFRAGGER_DOWNLOAD(msfragger, token, update)
+        DIATRACER_DOWNLOAD(diatracer, token, update)
         DIANN_DOWNLOAD(diann, diann_download, update) 
 
         CHECK_DEPENDENCY(IONQUANT_DOWNLOAD.out, 
                         MSFRAGGER_DOWNLOAD.out, 
                         DIATRACER_DOWNLOAD.out, 
                         DIANN_DOWNLOAD.out)
-
-    emit:
-        CHECK_DEPENDENCY.out
+        emit:
+            CHECK_DEPENDENCY.out
 }
 // FragPipe sub-workflow
 workflow FRAGPIPE_WF{
@@ -184,6 +209,13 @@ workflow {
     threads = Channel.of(params.threads)
     ram = Channel.of(params.ram)
 
+    addDownloadInformation()
+    //auth_ch = AUTHENTICATION(download_first_name, download_last_name, download_email, download_institution, license_accept)
+    //token_ch = auth_ch.map { it -> token(it) }
+    //token_ch.view { token -> "Token: $token" }
+    //token_channel = Channel.of(token)
+    //CONFIG_TOOLS_WF(token_ch, ionquant_jar, msfragger_jar, diatracer_jar, diann, params.diann_download, params.config_tools_update)
+
     if (!params.disable_msconvert){
         println "hello"
         MSCONVERTER_WF(raw_file_type, batch_size)
@@ -192,9 +224,10 @@ workflow {
         //Config Tools
         addDownloadInformation()
         
-        CONFIG_TOOLS_WF(download_name, download_email, download_institution, license_accept,
-                    ionquant_jar, msfragger_jar, diatracer_jar, diann, params.diann_download, 
-                    params.config_tools_update)
+        auth_ch = AUTHENTICATION(download_first_name, download_last_name, download_email, download_institution, license_accept)
+        token_ch = auth_ch.map { it -> token(it) }
+
+        CONFIG_TOOLS_WF(token_ch, ionquant_jar, msfragger_jar, diatracer_jar, diann, params.diann_download, params.config_tools_update)
    
         if (params.disable_msconvert){
             FRAGPIPE_WF(CONFIG_TOOLS_WF.out, input_folder, 
@@ -231,7 +264,18 @@ diann = false
 //***************
 //****LICENCE****
 //***************
-download_name = ''
+download_first_name = ''
+download_last_name = ''
 download_email = ''
 download_institution = ''
 license_accept = false
+//token=''
+
+//***************
+//****COLORS*****
+//***************
+RED = "\u001B[31m"
+GREEN = "\u001B[32m"
+YELLOW = "\u001B[33m"
+CYAN = "\u001B[36m"
+RESET = "\u001B[0m"

@@ -18,36 +18,58 @@ process CHECK_DEPENDENCY{
     """
 }
 
+process AUTHENTICATE{
+
+    input:
+        val first_name
+        val last_name
+        val email
+        val institution
+        val license
+
+    output:
+        val true
+    script:
+        """
+        NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/upgrader/latest_version.php)
+
+            curl --location --request POST 'https://msfragger-upgrader.nesvilab.org/upgrader/upgrade_download.php'\
+                --form 'transfer="academic"'\
+                --form 'agreement2="$license"'\
+                --form 'agreement3="$license"'\
+                --form 'first_name="$first_name"'\
+                --form 'last_name="$last_name"'\
+                --form 'email="$email"'\
+                --form 'organization="$institution"'\
+                --form "download=\${NEWEST_VERSION}\\\$zip"\
+                --form 'is_fragpipe="true"' 
+
+        """
+}
+
 process IONQUANT_DOWNLOAD{
     publishDir "${projectDir}/config_tools", mode: 'move'
 
     input:
         val ionquant
-        val name
-        val email
-        val institution
-        val license
+        val token
         val update
 
     output:
-        path 'IonQuant-*.jar'
+        path 'ionquant'
     script:
         """
-        NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/ionquant/latest_version.php)
         if [[ $ionquant == false || $update == true ]]; then
             echo "Downloading IonQuant"
-
-            curl --location --request POST 'https://msfragger-upgrader.nesvilab.org/ionquant/upgrade_download.php' \
-                --form 'transfer="academic"' \
-                --form 'agreement1="$license"' \
-                --form 'name="$name"' \
-                --form 'email="$email"' \
-                --form 'organization="$institution"' \
-                --form "download=\${NEWEST_VERSION}\\\$jar" \
-                --output IonQuant-\${NEWEST_VERSION}.jar
+            NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/ionquant/latest_version.php)
+            curl --output ionquant.zip \
+                    "https://msfragger-upgrader.nesvilab.org/ionquant/download.php?token=$token&download=\${NEWEST_VERSION}%24zip"
+        
+            unzip ionquant.zip
+            mv IonQuant* ionquant
         else
             echo "IonQuant already exists"
-            cp $projectDir/config_tools/IonQuant-\${NEWEST_VERSION}.jar IonQuant-\${NEWEST_VERSION}.jar
+            cp $projectDir/config_tools/ionquant ionquant
         fi
         """
 }
@@ -57,10 +79,7 @@ process MSFRAGGER_DOWNLOAD{
 
     input:
         val msfragger
-        val name
-        val email
-        val institution
-        val license
+        val token
         val update
 
     output:
@@ -72,15 +91,9 @@ process MSFRAGGER_DOWNLOAD{
             # download msfragger
             NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/upgrader/latest_version.php)
 
-            curl --location --request POST 'https://msfragger-upgrader.nesvilab.org/upgrader/upgrade_download.php'\
-                --form 'transfer="academic"'\
-                --form 'agreement2="$license"'\
-                --form 'agreement3="$license"'\
-                --form 'name="$name"'\
-                --form 'email="$email"'\
-                --form 'organization="$institution"'\
-                --form "download=\${NEWEST_VERSION}\\\$zip"\
-                --output msfragger.zip
+            UNI_NEWEST_VERSION=\${NEWEST_VERSION// /%20}
+
+            curl --output msfragger.zip "https://msfragger-upgrader.nesvilab.org/upgrader/download.php?token=$token&download=\${UNI_NEWEST_VERSION}%24zip"\
 
             unzip msfragger.zip
             mv MSFragger* msfragger
@@ -96,33 +109,25 @@ process DIATRACER_DOWNLOAD{
 
     input:
         val diatracer
-        val name
-        val email
-        val institution
-        val license
+        val token
         val update
 
     output:
-        path 'diaTracer-*.jar'
+        path 'diatracer'
 
     script:
         """
-        NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/diatracer/latest_version.php)
         echo $diatracer
         if [[ ($diatracer == "false" || $update == "true") ]]; then
             # download diatracer
+            NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/diatracer/latest_version.php)
+            curl --output diatracer.zip "https://msfragger-upgrader.nesvilab.org/diatracer/download.php?token=$token&download=\${NEWEST_VERSION}%24zip"
             
-            curl --location --request POST 'https://msfragger-upgrader.nesvilab.org/diatracer/upgrade_download.php'\
-                --form 'transfer="academic"'\
-                --form 'agreement1="$license"'\
-                --form 'name="$name"'\
-                --form 'email="$email"'\
-                --form 'organization="$institution"'\
-                --form "download=\${NEWEST_VERSION}\\\$jar"\
-                --output diaTracer-\${NEWEST_VERSION}.jar
+            unzip diatracer.zip
+            mv diaTracer* diatracer
         else
             echo "Diatracer already exists"
-            cp $projectDir/config_tools/diaTracer-\${NEWEST_VERSION}.jar diaTracer-\${NEWEST_VERSION}.jar
+            cp $projectDir/config_tools/diatracer diatracer
         fi
         """
 }
