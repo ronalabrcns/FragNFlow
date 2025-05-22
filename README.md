@@ -1,4 +1,4 @@
-# FragFlow
+# Frag'n'Flow
 **Automated Workflow for Large-Scale Quantitative Proteomics in High Performance Computing Environments**
 
 ### **Table of contents**
@@ -9,10 +9,10 @@
 >[Installation](#installation)
 >> [Prerequisite: Nextflow](#prerequisite-nextflow)
 
->[Using FragFlow](#using-fragflow)
+>[Using Frag'n'Flow](#using-fragnflow)
 >> [1. Preparing input files](#1-preparing-input-files)\
 >> [2. Configuration](#2-configuration)\
->> [3. Starting FragFlow](#3-running-fragflow)\
+>> [3. Starting Frag'n'Flow](#3-running-fragnflow)\
 >> [4. Config Tools Download](#4-downloading-licensed-fragpipe-components-config-tools)\
 >> [5. Notes on DIA-NN version](#5-notes-on-dia-nn-version)\
 >> [6. Outputs](#6-outputs)
@@ -29,7 +29,7 @@
 >[Authors](#authors)
 
 ### Introduction
- <div align="justify"> Here we introduce FragFlow an open-source pipeline that integrates FragPipe (FP) with Nextflow, a powerful workflow management system, to create a scalable, reproducible, and high-performance solution for proteomic data analysis. Nextflow enhances FP by automating workflows across HPC, cloud, and cluster environments, ensuring portability and reproducibility. Our integrated pipeline also streamlines downstream analyses, including differential expression, pathway mapping, and data visualization, while maintaining the ease of deploying across diverse computing infrastructures. This work represents a significant step forward in making the FP-based state-of-the-art proteomic data analysis more accessible and efficient for the broader research community.</div>
+ <div align="justify"> Here we introduce Frag'n'Flow an open-source pipeline that integrates FragPipe (FP) with Nextflow, a powerful workflow management system, to create a scalable, reproducible, and high-performance solution for proteomic data analysis. Nextflow enhances FP by automating workflows across HPC, cloud, and cluster environments, ensuring portability and reproducibility. Our integrated pipeline also streamlines downstream analyses, including differential expression, pathway mapping, and data visualization, while maintaining the ease of deploying across diverse computing infrastructures. This work represents a significant step forward in making the FP-based state-of-the-art proteomic data analysis more accessible and efficient for the broader research community.</div>
 
 ### Workflow and overview
 <div align="justify"> This repository contains a Nextflow-based workflow for running FragPipe — a powerful toolkit for mass spectrometry data analysis (Figure 1). It supports all major data analysis modes available in FragPipe, while offering enhanced automation, and easy deployment.</div>
@@ -54,8 +54,8 @@ This workflow simplifies MS data analysis on Unix-based systems (HPC, cloud, etc
 8. **FragPipe-Analyst Integration:** Optionally runs FP-Analyst for quick statistical DE result predictions (also available standalone).
 
 ![image](./workflow_fragflow.png)
-**Figure 1. - Overview of the FragFlow pipeline.**
- <div align="justify">Overview of the FragFlow workflow, composed of six modular sub-workflows, each representing a key functionality in the automated proteomics analysis pipeline. FragFlow supports all major predefined FragPipe (FP) analysis modes as well as custom user-defined configurations. Manifest module generates the FP input manifest file from a specified directory, with optional raw file conversion. Database module downloads the appropriate reference proteome and appends decoy sequences for target-decoy analysis. Workflow module defines the FP analysis mode (e.g., LFQ, TMT, DIA) to be executed. Download module retrieves necessary licensed tools (e.g., MSFragger, IonQuant, diaTracer) in compliance with FP licensing agreements. FragPipe core module executes the main mass spectrometry analysis using the manifest and workflow configuration files. FragPipe-Analyst module performs downstream statistical analysis and visualization, generating plots such as PCA, volcano plots, and heatmaps.</div>
+**Figure 1. - Overview of the Frag'n'Flow pipeline.**
+ <div align="justify">Overview of the Frag'n'Flow workflow, composed of six modular sub-workflows, each representing a key functionality in the automated proteomics analysis pipeline. Frag'n'Flow supports all major predefined FragPipe (FP) analysis modes as well as custom user-defined configurations. Manifest module generates the FP input manifest file from a specified directory, with optional raw file conversion. Database module downloads the appropriate reference proteome and appends decoy sequences for target-decoy analysis. Workflow module defines the FP analysis mode (e.g., LFQ, TMT, DIA) to be executed. Download module retrieves necessary licensed tools (e.g., MSFragger, IonQuant, diaTracer) in compliance with FP licensing agreements. FragPipe core module executes the main mass spectrometry analysis using the manifest and workflow configuration files. FragPipe-Analyst module performs downstream statistical analysis and visualization, generating plots such as PCA, volcano plots, and heatmaps.</div>
 
 -----
 
@@ -78,7 +78,7 @@ Then, verify the installation:
 nextflow -version
 ```
 
-## Using FragFlow
+## Using Frag'n'Flow
 ### 1. Preparing input files
 By default ```.raw``` and ```.mzML``` mass spectrometry files are supported. Other file types may also be used - please refer to the [MSConverter sub-workflow](#msconverter) for compatibility details.\
 **File naming convention:**
@@ -110,10 +110,10 @@ Input parameters can be defined in multiple ways:
 - **B. Using custom config file (```<your_file>.config```)**
     - Definie parameters and global options in a custom config format.
     - Specify the config file when running Nextflow:
-    - Ideal to launch FragFlow from link.
+    - Ideal to launch Frag'n'Flow from link.
     - Refer to Nextflow's documentation on <a href="https://www.nextflow.io/docs/latest/config.html" target="_blank">configuration files</a>
 ```
-nextflow run ronalabrcns/FragFlow -c custom_config_example.config
+nextflow run ronalabrcns/FragNFlow -c custom_config_example.config
 ```
 > *Note: Custom config files are ideal for parameter file definitions and also for global process settings, see example below.*
 ```
@@ -126,7 +126,7 @@ params.fasta_file = 'path/to/fasta/file.fasta'
     - Recommended for quick and flexible excecution
     - Example command:
 ```
-nextflow run ronalabrcns/FragFlow \
+nextflow run ronalabrcns/FragNFlow \
     --input_folder "/path/to/input/folder" \
     --ram 32 \
     --threads 16 \
@@ -137,7 +137,7 @@ nextflow run ronalabrcns/FragFlow \
 **For further details please check Nextflow's documentation on the [hierarchy of parameter settings](https://www.nextflow.io/docs/latest/config.html).\
 \
 **Mandatory parameters:**
-To successfully execute FragFlow, the following parameters must be specified:
+To successfully execute Frag'n'Flow, the following parameters must be specified:
 - ```--input_folder``` - Path to the input folder
 - ```--workflow``` - Selected FP workflow
 - ```--mode``` - Aqcuisition mode
@@ -145,17 +145,17 @@ To successfully execute FragFlow, the following parameters must be specified:
 
 For more details on parameters please see the [Parameters](#parameters) section.
 
-### 3. Running FragFlow
-When runnning FragFlow, all output files will be generated into the current working directory. If executing multiple analysis, **ensure that you are in the correct directory before starting the workflow!**\
+### 3. Running Frag'n'Flow
+When runnning Frag'n'Flow, all output files will be generated into the current working directory. If executing multiple analysis, **ensure that you are in the correct directory before starting the workflow!**\
 \
 **Basic execution**
 ``` 
-nextflow run ronalabrcns/FragFlow
+nextflow run ronalabrcns/FragNFlow
 ```
 \
-**Defining Executors for FragFlow**\
+**Defining Executors for Frag'n'Flow**\
 In Nextflow, **executors** are the components that determine the system where a process is run and supervises the execution. Such executors include AWS, Azure Batch, SLURM etc. Please refer to Nextflow's documentation on [available executors](https://www.nextflow.io/docs/latest/executor.html).\
-To define SLURM options in FragFlow please define options in the ```nextflow.config``` or the custom ```example.config``` files. The ```clusterOptions``` is used to define additional available [```sbatch``` options](https://slurm.schedmd.com/sbatch.html) to the process.
+To define SLURM options in Frag'n'Flow please define options in the ```nextflow.config``` or the custom ```example.config``` files. The ```clusterOptions``` is used to define additional available [```sbatch``` options](https://slurm.schedmd.com/sbatch.html) to the process.
 ```
 process{
     withName:FRAGPIPE{
@@ -169,21 +169,21 @@ process{
 ```
 \
 **Running as a background process**\
-For long-runnning analysis, it is recommended to start FragFlow as a background process. This allows uninterrupted execution even if the terminal session is closed (similar to *nohup*). To do so, use the ```-bg``` option and redircet the ouptut to a log file:
+For long-runnning analysis, it is recommended to start Frag'n'Flow as a background process. This allows uninterrupted execution even if the terminal session is closed (similar to *nohup*). To do so, use the ```-bg``` option and redircet the ouptut to a log file:
 ```
-nextflow run ronalabrcns/FragFlow -bg > fragflow.log
+nextflow run ronalabrcns/FragNFlow -bg > fragnflow.log
 ```
-This ensures that the process continues running while logs are stored in fragflow.log for monitoring.
+This ensures that the process continues running while logs are stored in fragnflow.log for monitoring.
 
-To cancel FragFlow, first identify the process pid using ```ps``` or alternatively check the ```.nextflow.pid``` to ```kill``` the process. More information on <a href="https://www.nextflow.io/docs/latest/cli.html#execution-as-a-background-job" target="_blank">background execution</a>.
+To cancel Frag'n'Flow, first identify the process pid using ```ps``` or alternatively check the ```.nextflow.pid``` to ```kill``` the process. More information on <a href="https://www.nextflow.io/docs/latest/cli.html#execution-as-a-background-job" target="_blank">background execution</a>.
 
 ### 4. Downloading licensed FragPipe components (config tools)
 <div align="justify">To enable a user-friendly execution of the workflow, the download process for essential configuration tools — namely MSFragger, diaTracer, and IonQuant — has been fully automated. During the initial analysis, all required tools will be downloaded into the project directory to keep everything organized and transparent. Before proceeding with the download, users are asked to provide their name, institution, and email address. In addition, users must read and accept the licensing terms for <a href="https://msfragger-upgrader.nesvilab.org/upgrader/MSFragger-LICENSE.pdf">MSFragger</a>, <a href="https://msfragger.arsci.com/ionquant/IonQuant Academic Use License 05162022.pdf">IonQuant</a>, and <a href="https://msfragger-upgrader.nesvilab.org/diatracer/diaTracer UM %23 2024-417 Academic Research Use License 05142024.pdf">diaTracer</a>. If the necessary information is not provided, or if the licensing terms are not explicitly accepted, the download process will be halted. This procedure ensures that all licensing directives are strictly respected and maintained throughout the workflow. <b>We kindly ask all users to carefully read and honor the licensing agreements</b> to support the continued development of these essential tools.</div>
 
 ### 5. Notes on DIA-NN version
-Currently FragPipe supports DIA-NN version 1.8.2beta. With FragFlow, users can add custom versions of DIA-NN to use. See latest release at: <a href="https://github.com/vdemichev/DiaNN/releases/latest" target="_blank"> *DIA-NN: latest* </a>
+Currently FragPipe supports DIA-NN version 1.8.2beta. With Frag'n'Flow, users can add custom versions of DIA-NN to use. See latest release at: <a href="https://github.com/vdemichev/DiaNN/releases/latest" target="_blank"> *DIA-NN: latest* </a>
 Define the download link to the *Linux* version of any DIA-NN release using the ```--diann_download``` parameter.\
-*Note: currently when using MSBooster, the newer versions of DIA-NN does not run successfully. For this reason, when specifying newer version of DIA-NN (1.8.2+), the newer version will only be used during the DIA-NN analysis. Additionally, current changes in newer DIA-NN modules, can raise errors in FP, which can be eventually handled by FP developers in future releases. This does not effect the results generated by FragFlow.*
+*Note: currently when using MSBooster, the newer versions of DIA-NN does not run successfully. For this reason, when specifying newer version of DIA-NN (1.8.2+), the newer version will only be used during the DIA-NN analysis. Additionally, current changes in newer DIA-NN modules, can raise errors in FP, which can be eventually handled by FP developers in future releases. This does not effect the results generated by Frag'n'Flow.*
 
 ### 6. Outputs
 All processes produce detailed log files, stored in the  ```work/XX/HEX/nextflow.log``` path, and generate structured outputs organized under the <b>Data</b> and <b>Output</b> folders. The Data folder includes files like the generated manifest, reference proteome database, and selected workflow configuration, while the Output folder contains converted mzML files, FragPipe results, and FP-Analyst reports in TSV, CSV, and PDF formats.
@@ -287,12 +287,12 @@ The MSConverter module handles raw mass spectrometry (MS) file conversion. We pr
 
 ### FragPipe
 The FragPipe module executes the main analysis pipeline. Only two mandatory input files are required: a manifest and a workflow. FragPipe runs the analysis and outputs results into the output/fragpipe/ folder. We support fully customized analyses by allowing users to supply their own manifest and workflow files.\
->If you're new to FragFlow, we strongly encourage checking out FragPipe’s [tutorials](https://fragpipe.nesvilab.org/docs/tutorial_fragpipe.html) and detailed explanations of its [workflow](https://fragpipe.nesvilab.org/docs/tutorial_fragpipe_workflows.html) modes.
+>If you're new to Frag'n'Flow, we strongly encourage checking out FragPipe’s [tutorials](https://fragpipe.nesvilab.org/docs/tutorial_fragpipe.html) and detailed explanations of its [workflow](https://fragpipe.nesvilab.org/docs/tutorial_fragpipe_workflows.html) modes.
 
 When FP-Analyst is enabled, key output files (e.g., experiment annotation and protein/peptide TSV files) are automatically copied to the input location for FP-Analyst.
 
 ### FragPipe-Analyst
-FragFlow also support the standalone execution of FragPipe-Analyst, for quick, on cluster execution of quality measurements and differential expression analysis. This way a quick first impulse can be seen by the data. However for more in depth analysis and lighter user experience the FragPipe-Analyst Shiny web app is highly recommended and appreciated. Our FP-Analyst module outputs a resulting csv file with all DE analysis results and a PDF file report with all the necessary plots and figures. 
+Frag'n'Flow also support the standalone execution of FragPipe-Analyst, for quick, on cluster execution of quality measurements and differential expression analysis. This way a quick first impulse can be seen by the data. However for more in depth analysis and lighter user experience the FragPipe-Analyst Shiny web app is highly recommended and appreciated. Our FP-Analyst module outputs a resulting csv file with all DE analysis results and a PDF file report with all the necessary plots and figures. 
 
 FP-Analyst can also be executed independently for fast, on-cluster quality assessment and differential expression analysis. This provides a quick initial overview of the data on the spot.\
 The FP-Analyst module produces:
