@@ -53,6 +53,7 @@ process FP_ANALYST{
     publishDir "output", mode: 'copy', overwrite: false
     
     container 'sznistvan/fp-anal-hpc:latest'
+    containerOptions "--cleanenv --bind $PWD,$HOME/.config,${params.input_folder},${launchDir},${projectDir}"
 
     input:
         val experiment_annotation

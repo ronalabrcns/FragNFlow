@@ -5,6 +5,7 @@ process WORKFLOW_DB{
     publishDir "data/workflow", mode: 'copy'
 
     container 'fcyucn/fragpipe:latest'
+    containerOptions "--cleanenv --bind $PWD,$HOME/.config,${params.input_folder},${launchDir},${projectDir}"
 
     input:
         val ready

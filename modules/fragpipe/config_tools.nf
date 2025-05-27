@@ -21,6 +21,7 @@ process CHECK_DEPENDENCY{
 process AUTHENTICATE{
 
     input:
+        val download_tools
         val first_name
         val last_name
         val email
@@ -28,9 +29,10 @@ process AUTHENTICATE{
         val license
 
     output:
-        val true
+        val download_tools
     script:
         """
+        if [[ $download_tools == true ]]; then
         NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/upgrader/latest_version.php)
 
             curl --location --request POST 'https://msfragger-upgrader.nesvilab.org/upgrader/upgrade_download.php'\
@@ -42,8 +44,8 @@ process AUTHENTICATE{
                 --form 'email="$email"'\
                 --form 'organization="$institution"'\
                 --form "download=\${NEWEST_VERSION}\\\$zip"\
-                --form 'is_fragpipe="true"' 
-
+                --form 'is_fragpipe="true"'
+        fi
         """
 }
 
@@ -53,13 +55,12 @@ process IONQUANT_DOWNLOAD{
     input:
         val ionquant
         val token
-        val update
 
     output:
         path 'ionquant'
     script:
         """
-        if [[ $ionquant == false || $update == true ]]; then
+        if [[ $ionquant == false ]]; then
             echo "Downloading IonQuant"
             NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/ionquant/latest_version.php)
             curl --output ionquant.zip \
@@ -69,7 +70,7 @@ process IONQUANT_DOWNLOAD{
             mv IonQuant* ionquant
         else
             echo "IonQuant already exists"
-            cp $projectDir/config_tools/ionquant ionquant
+            cp -r $projectDir/config_tools/ionquant ionquant
         fi
         """
 }
@@ -80,14 +81,13 @@ process MSFRAGGER_DOWNLOAD{
     input:
         val msfragger
         val token
-        val update
 
     output:
         path 'msfragger'
 
     script:
         """
-        if [[ $msfragger == false || $update == true ]]; then
+        if [[ $msfragger == false ]]; then
             # download msfragger
             NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/upgrader/latest_version.php)
 
@@ -110,7 +110,6 @@ process DIATRACER_DOWNLOAD{
     input:
         val diatracer
         val token
-        val update
 
     output:
         path 'diatracer'
@@ -118,7 +117,7 @@ process DIATRACER_DOWNLOAD{
     script:
         """
         echo $diatracer
-        if [[ ($diatracer == "false" || $update == "true") ]]; then
+        if [[ $diatracer == "false" ]]; then
             # download diatracer
             NEWEST_VERSION=\$(curl https://msfragger-upgrader.nesvilab.org/diatracer/latest_version.php)
             curl --output diatracer.zip "https://msfragger-upgrader.nesvilab.org/diatracer/download.php?token=$token&download=\${NEWEST_VERSION}%24zip"
@@ -127,24 +126,23 @@ process DIATRACER_DOWNLOAD{
             mv diaTracer* diatracer
         else
             echo "Diatracer already exists"
-            cp $projectDir/config_tools/diatracer diatracer
+            cp -r $projectDir/config_tools/diatracer diatracer
         fi
         """
 }
 
 process DIANN_DOWNLOAD{
-    publishDir "${projectDir}/config_tools", mode: 'move'
+    publishDir "${projectDir}/diann", mode: 'move'
 
     input:
         val diann
         val link
-        val update
 
     output:
         path 'diann'
     """
     # download DIA-NN
-    if [[ ($diann == false || $update == true) && -n $link ]]; then
+    if [[ $diann == false && -n $link ]]; then
         echo "Downloading DIA-NN"
         wget $link -O diann.zip
         unzip diann.zip -d diann
@@ -152,7 +150,7 @@ process DIANN_DOWNLOAD{
         chmod 755 diann/diann/diann-linux
     else
         echo "DIA-NN already exists"
-        mv $projectDir/config_tools/diann diann
+        mv $projectDir/diann diann
     fi
     """
 }

@@ -22,71 +22,7 @@ include { AUTHENTICATE; IONQUANT_DOWNLOAD; MSFRAGGER_DOWNLOAD; DIATRACER_DOWNLOA
 include { FRAGPIPE } from './modules/fragpipe/fragpipe.nf'
 include { FP_ANALYST; COLLECT_FP_ANALYST_FILES } from './modules/fp_analyst/fp_analyst.nf'
 
-def licensingInformation(){
-    // Print the licensing information
-    println file(projectDir + '/modules/fragpipe/infos/licensing_information.txt').text
-}
-
-def additionMSFraggerLicensingInformationIonQuant(){
-    // Print MSFragger licensing information
-    println file(projectDir + '/modules/fragpipe/infos/msfragger_licensing_information.txt').text 
-}
-
-def addDownloadInformation(){
-    // Stdin download information from the user
-    def configToolsDir = new File(projectDir.toFile(), 'config_tools')
-
-    ionquant_jar = file(projectDir + '/config_tools/ionquant/').isDirectory()
-    msfragger_jar = file(projectDir + '/config_tools/msfragger/').isDirectory()
-    diatracer_jar = file(projectDir + '/config_tools/diatracer/').isDirectory()
-    diann = file(projectDir + '/config_tools/diann').isDirectory()
-
-    println ionquant_jar ? "${GREEN}IonQuant is available" : "${RED}IonQuant is not available"
-    println msfragger_jar ? "${GREEN}MSFragger is available" : "${RED}MSFragger is not available"
-    println diatracer_jar ? "${GREEN}DiaTracer is available" : "${RED}DiaTracer is not available"
-    println diann ? "${GREEN}DIA-NN is available" : "${RED}DIA-NN is not available"
-
-    if (!ionquant_jar || !msfragger_jar || !diatracer_jar || params.config_tools_update){
-        println "Config tools are not available (IonQuant, MSFragger, DiaTracer)."
-        println "PLEASE ENTER THE CONTACT INFORMATION TO DOWNLOAD:"
-        println "First Name:"
-        download_first_name = System.in.newReader().readLine()
-        println "Last Name:"
-        download_last_name = System.in.newReader().readLine()
-        println "\nEmail:"
-        download_email = System.in.newReader().readLine()
-        println "\nInstitution:"
-        download_institution = System.in.newReader().readLine()
-
-        licensingInformation()
-        if (System.in.newReader().readLine().toLowerCase().matches("yes|y")){
-            license_accept = true
-        }
-        else{
-            license_accept = false
-            error "Please accept the licensing information to proceed!"
-        }
-        
-        if (!msfragger_jar || params.config_tools_update){
-            additionMSFraggerLicensingInformationIonQuant()
-            if (System.in.newReader().readLine().toLowerCase().matches("yes|y")){
-                license_accept = true
-            }
-            else{
-                license_accept = false
-                error "Please accept the licensing information to proceed!"
-            }
-        }
-    }
-}
-
-def token(input){
-    println "Authentication code:"
-    def token = System.in.newReader().readLine()
-    println "Token: $token"
-
-    return token
-}
+include { addDownloadInformation; token; checkEmailForToken } from './init/config_tools_init.nf'
 
 // MSConverter sub-workflow
 workflow MSCONVERTER_WF{
@@ -110,6 +46,7 @@ workflow MSCONVERTER_WF{
 
 workflow AUTHENTICATION{
     take:
+        download_tools
         first_name
         last_name
         email
@@ -117,7 +54,10 @@ workflow AUTHENTICATION{
         license
 
     main:
-        AUTHENTICATE(first_name, last_name, email, institution, license)
+        AUTHENTICATE(download_tools, first_name, last_name, email, institution, license)
+        if (download_tools){
+            checkEmailForToken()
+        }
     emit:
         AUTHENTICATE.out
 }
@@ -131,21 +71,16 @@ workflow CONFIG_TOOLS_WF{
         diatracer
         diann
         diann_download
-        update
 
     main:
-        //AUTHENTICATE(first_name, last_name, email, institution, license)
-        //TODO: add a seprate sub-workflow for the authentication
-        // After that we can call the token read input function in the main workflow
-        //Continueu with this worklfow with tool downloads!
 
-        IONQUANT_DOWNLOAD(ionquant, token, update)
-        MSFRAGGER_DOWNLOAD(msfragger, token, update)
-        DIATRACER_DOWNLOAD(diatracer, token, update)
-        DIANN_DOWNLOAD(diann, diann_download, update) 
+        IONQUANT_DOWNLOAD(ionquant, token)
+        MSFRAGGER_DOWNLOAD(msfragger, token)
+        DIATRACER_DOWNLOAD(diatracer, token)
+        DIANN_DOWNLOAD(diann, diann_download)
 
-        CHECK_DEPENDENCY(IONQUANT_DOWNLOAD.out, 
-                        MSFRAGGER_DOWNLOAD.out, 
+        CHECK_DEPENDENCY(IONQUANT_DOWNLOAD.out,
+                        MSFRAGGER_DOWNLOAD.out,
                         DIATRACER_DOWNLOAD.out, 
                         DIANN_DOWNLOAD.out)
         emit:
@@ -170,7 +105,7 @@ workflow FRAGPIPE_WF{
 
         DATABASE(fasta_file, decoy_tag)
 
-        WORKFLOW_DB(DATABASE.out, workflow, decoy_tag)
+        WORKFLOW_DB(DATABASE.out[0], workflow, decoy_tag)
 
         FRAGPIPE(config_tools, MANIFEST.out, WORKFLOW_DB.out[0], WORKFLOW_DB.out[1], ram, threads, mode, diann_download)
 
@@ -209,34 +144,32 @@ workflow {
     threads = Channel.of(params.threads)
     ram = Channel.of(params.ram)
 
-    addDownloadInformation()
-    //auth_ch = AUTHENTICATION(download_first_name, download_last_name, download_email, download_institution, license_accept)
-    //token_ch = auth_ch.map { it -> token(it) }
-    //token_ch.view { token -> "Token: $token" }
-    //token_channel = Channel.of(token)
-    //CONFIG_TOOLS_WF(token_ch, ionquant_jar, msfragger_jar, diatracer_jar, diann, params.diann_download, params.config_tools_update)
+    if (params.config_tools){
+        //Config Tools
+        //TODO add a disable option for the config tools this way an init install process can be run
+        //without the need of running the whole workflow
+        infos = addDownloadInformation()
 
+        auth_ch = AUTHENTICATION(infos.download_tools, infos.download_first_name, infos.download_last_name, infos.download_email, infos.download_institution, infos.license_accept)
+        token_ch = infos.download_tools ? auth_ch.map { token(it) } : Channel.of('1234')
+        CONFIG_TOOLS_WF(token_ch, infos.ionquant_jar, infos.msfragger_jar, infos.diatracer_jar, infos.diann, params.diann_download)
+    }
     if (!params.disable_msconvert){
-        println "hello"
         MSCONVERTER_WF(raw_file_type, batch_size)
     }
     if (!params.disable_fragpipe){
-        //Config Tools
-        addDownloadInformation()
-        
-        auth_ch = AUTHENTICATION(download_first_name, download_last_name, download_email, download_institution, license_accept)
-        token_ch = auth_ch.map { it -> token(it) }
 
-        CONFIG_TOOLS_WF(token_ch, ionquant_jar, msfragger_jar, diatracer_jar, diann, params.diann_download, params.config_tools_update)
-   
+        def config_tools_out = params.config_tools ? CONFIG_TOOLS_WF.out : true
+
         if (params.disable_msconvert){
-            FRAGPIPE_WF(CONFIG_TOOLS_WF.out, input_folder, 
-                    mode, workflow, fasta_file, 
+
+            FRAGPIPE_WF(config_tools_out, input_folder,
+                    mode, workflow, fasta_file,
                     decoy_tag, threads, ram, params.diann_download, params.analyst_mode)
         }
         else{
-            FRAGPIPE_WF(CONFIG_TOOLS_WF.out, MSCONVERTER_WF.out, 
-                        mode, workflow, fasta_file, 
+            FRAGPIPE_WF(config_tools_out, MSCONVERTER_WF.out,
+                        mode, workflow, fasta_file,
                         decoy_tag, threads, ram, params.diann_download, params.analyst_mode)
         }
     }
@@ -250,32 +183,3 @@ workflow {
         }    
     }
 }
-
-
-
-//***************
-//****CONFIG*****
-//***************
-ionquant_jar = false
-msfragger_jar = false
-diatracer_jar = false
-diann = false
-
-//***************
-//****LICENCE****
-//***************
-download_first_name = ''
-download_last_name = ''
-download_email = ''
-download_institution = ''
-license_accept = false
-//token=''
-
-//***************
-//****COLORS*****
-//***************
-RED = "\u001B[31m"
-GREEN = "\u001B[32m"
-YELLOW = "\u001B[33m"
-CYAN = "\u001B[36m"
-RESET = "\u001B[0m"

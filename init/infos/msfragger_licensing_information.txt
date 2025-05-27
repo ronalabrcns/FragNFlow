@@ -1,0 +1,12 @@
+
+Please read and aggree to the following terms for using MSFragger:
+
+    - https://msfragger-upgrader.nesvilab.org/upgrader/RawFileRdr_License_Agreement_RevA.pdf
+    - https://msfragger-upgrader.nesvilab.org/upgrader/EULA TDF-SDK.pdf
+
+"I agree to the terms of Thermo (c) Raw File Reader License Agreement."
+"I agree to the terms of Bruker SDK library distribution conditions." 
+
+--------------------------------------------------------------------------------
+
+[YES/NO]    

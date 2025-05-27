@@ -1,7 +1,9 @@
 work/
 output/
 config_tools/
+diann/
 data/
+singularity/
 
 .nextflow*
 .update-timestamp
