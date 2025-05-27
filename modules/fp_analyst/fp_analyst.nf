@@ -41,9 +41,9 @@ process COLLECT_FP_ANALYST_FILES{
         fi
     elif [[ $mode == "DIA" ]]; then
         if [[ $analyst_mode == "peptide" ]]; then
-            cat \$out_fp_dir/diann-output/report.pr_matrix.tsv > p_table.tsv
+            cat \$out_fp_dir/dia-quant-output/report.pr_matrix.tsv > p_table.tsv
         else
-            cat \$out_fp_dir/diann-output/report.pg_matrix.tsv > p_table.tsv
+            cat \$out_fp_dir/dia-quant-output/report.pg_matrix.tsv > p_table.tsv
         fi
     fi
     """   

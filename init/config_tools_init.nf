@@ -25,7 +25,7 @@ def addDownloadInformation(){
     ionquant_jar = file(projectDir + '/config_tools/ionquant/').isDirectory()
     msfragger_jar = file(projectDir + '/config_tools/msfragger/').isDirectory()
     diatracer_jar = file(projectDir + '/config_tools/diatracer/').isDirectory()
-    diann = file(projectDir + '/config_tools/diann').isDirectory()
+    diann = file(projectDir + '/diann').isDirectory()
 
     println "--------------------- Tools availability -------------------------"
     println ionquant_jar ? "${GREEN}✅ IonQuant : available" : "${RED}❌ IonQuant : not available"

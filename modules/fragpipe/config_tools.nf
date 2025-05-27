@@ -132,7 +132,7 @@ process DIATRACER_DOWNLOAD{
 }
 
 process DIANN_DOWNLOAD{
-    publishDir "${projectDir}/diann", mode: 'move'
+    publishDir "${projectDir}", mode: 'move'
 
     input:
         val diann

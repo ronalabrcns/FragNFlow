@@ -151,7 +151,7 @@ workflow {
         infos = addDownloadInformation()
 
         auth_ch = AUTHENTICATION(infos.download_tools, infos.download_first_name, infos.download_last_name, infos.download_email, infos.download_institution, infos.license_accept)
-        token_ch = infos.download_tools ? auth_ch.map { token(it) } : Channel.of('1234')
+        token_ch = infos.download_tools ? auth_ch.map { token(it) } : Channel.of("")
         CONFIG_TOOLS_WF(token_ch, infos.ionquant_jar, infos.msfragger_jar, infos.diatracer_jar, infos.diann, params.diann_download)
     }
     if (!params.disable_msconvert){
