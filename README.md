@@ -53,11 +53,13 @@ This workflow simplifies MS data analysis on Unix-based systems (HPC, cloud, etc
 7. **FragPipe Executions:** Runs the desired FP analysis workflow (also available standalone).
 8. **FragPipe-Analyst Integration:** Optionally runs FP-Analyst for quick statistical DE result predictions (also available standalone).
 
-![image](./workflow_fragflow.png)
+![image](./workflow_fragnflow.png)
 **Figure 1. - Overview of the Frag'n'Flow pipeline.**
  <div align="justify">Overview of the Frag'n'Flow workflow, composed of six modular sub-workflows, each representing a key functionality in the automated proteomics analysis pipeline. Frag'n'Flow supports all major predefined FragPipe (FP) analysis modes as well as custom user-defined configurations. Manifest module generates the FP input manifest file from a specified directory, with optional raw file conversion. Database module downloads the appropriate reference proteome and appends decoy sequences for target-decoy analysis. Workflow module defines the FP analysis mode (e.g., LFQ, TMT, DIA) to be executed. Download module retrieves necessary licensed tools (e.g., MSFragger, IonQuant, diaTracer) in compliance with FP licensing agreements. FragPipe core module executes the main mass spectrometry analysis using the manifest and workflow configuration files. FragPipe-Analyst module performs downstream statistical analysis and visualization, generating plots such as PCA, volcano plots, and heatmaps.</div>
 
 -----
+## Before you begin
+> We highly recommend thoroughly reading the following detailed and well-written documentations on [FragPipe](https://fragpipe.nesvilab.org/docs/tutorial_fragpipe.html) and [Nextflow](https://www.nextflow.io/docs/latest/index.html).
 
 ## Installation
 ### Prerequisite: Nextflow
@@ -134,8 +136,9 @@ nextflow run ronalabrcns/FragNFlow \
     --mode "DDA" \
     --fasta_file "UP000005640"
 ```
-**For further details please check Nextflow's documentation on the [hierarchy of parameter settings](https://www.nextflow.io/docs/latest/config.html).\
-\
+> For further details please check Nextflow's documentation on the [hierarchy of parameter settings](https://www.nextflow.io/docs/latest/config.html).
+
+
 **Mandatory parameters:**
 To successfully execute Frag'n'Flow, the following parameters must be specified:
 - ```--input_folder``` - Path to the input folder
@@ -178,7 +181,11 @@ This ensures that the process continues running while logs are stored in fragnfl
 To cancel Frag'n'Flow, first identify the process pid using ```ps``` or alternatively check the ```.nextflow.pid``` to ```kill``` the process. More information on <a href="https://www.nextflow.io/docs/latest/cli.html#execution-as-a-background-job" target="_blank">background execution</a>.
 
 ### 4. Downloading licensed FragPipe components (config tools)
-<div align="justify">To enable a user-friendly execution of the workflow, the download process for essential configuration tools — namely MSFragger, diaTracer, and IonQuant — has been fully automated. During the initial analysis, all required tools will be downloaded into the project directory to keep everything organized and transparent. Before proceeding with the download, users are asked to provide their name, institution, and email address. In addition, users must read and accept the licensing terms for <a href="https://msfragger-upgrader.nesvilab.org/upgrader/MSFragger-LICENSE.pdf">MSFragger</a>, <a href="https://msfragger.arsci.com/ionquant/IonQuant Academic Use License 05162022.pdf">IonQuant</a>, and <a href="https://msfragger-upgrader.nesvilab.org/diatracer/diaTracer UM %23 2024-417 Academic Research Use License 05142024.pdf">diaTracer</a>. If the necessary information is not provided, or if the licensing terms are not explicitly accepted, the download process will be halted. This procedure ensures that all licensing directives are strictly respected and maintained throughout the workflow. <b>We kindly ask all users to carefully read and honor the licensing agreements</b> to support the continued development of these essential tools.</div>
+<div align="justify">To enable a user-friendly execution of the workflow, the download process for essential configuration tools — namely MSFragger, diaTracer, and IonQuant — has been fully automated. During the initial run, please download all required tools will be downloaded into the project directory to keep everything organized and transparent. </div>
+
+>Set the parameter ```--config_tools``` to ```true``` on the very first run to start config tools download.
+
+<div align="justify">Before proceeding with the download, users are asked to provide their name, institution, and email address. Only academic email adresses are accepted where the user gets a verification token. Use this token then to start the downloads. In addition, users must read and accept the licensing terms for <a href="https://msfragger-upgrader.nesvilab.org/upgrader/MSFragger-LICENSE.pdf">MSFragger</a>, <a href="https://msfragger.arsci.com/ionquant/IonQuant Academic Use License 05162022.pdf">IonQuant</a>, and <a href="https://msfragger-upgrader.nesvilab.org/diatracer/diaTracer UM %23 2024-417 Academic Research Use License 05142024.pdf">diaTracer</a>. If the necessary information is not provided, or if the licensing terms are not explicitly accepted, the download process will be halted. This procedure ensures that all licensing directives are strictly respected and maintained throughout the workflow. <b>We kindly ask all users to carefully read and honor the licensing agreements</b> to support the continued development of these essential tools.</div>
 
 ### 5. Notes on DIA-NN version
 Currently FragPipe supports DIA-NN version 1.8.2beta. With Frag'n'Flow, users can add custom versions of DIA-NN to use. See latest release at: <a href="https://github.com/vdemichev/DiaNN/releases/latest" target="_blank"> *DIA-NN: latest* </a>
@@ -231,6 +238,19 @@ All processes produce detailed log files, stored in the  ```work/XX/HEX/nextflow
 
 ## Parameters
 Parameters are accesible through the *nextflow.config* file. Additionally, every parameter can be added during execution e.g. *--input_folder*.
+
+**Licensed config tools download:**
+|Parameter|Types|Description|
+|---------|-----|-----------|
+|```--config_tools```|*boolean*|Allow (true) the download of licensed config tools (MSFragger, IonQuant, diaTracer)|
+
+**Sub-workflow switch parameters:**
+|Parameter|Types|Description|
+|---------|-----|-----------|
+|```--disable_msconvert```|*boolean*|Turn on-off the sub-workflow MSConverter|
+|```--disable_fragpipe```|*boolean*|Turn on-off the sub-workflow FragPipe|
+|```--disable_fp_analyst```|*boolean*|Turn on-off the sub-workflow FragPipe-Analyst|
+
 **Mandatory parameters:**
 |Parameters|Types|Description|
 |-----------------|-----|-----------|
@@ -253,18 +273,11 @@ Parameter|Types|Description|
 |```--ram```|*integer*|Memory allocation for FragPipe [GB]|
 |```--threads```|*integer*|Number of threads defined for FragPiipe|
 
-**Sub-workflow switch parameters:**
-|Parameter|Types|Description|
-|---------|-----|-----------|
-|```--disable_msconvert```|*boolean*|Turn on-off the sub-workflow MSConverter|
-|```--disable_fragpipe```|*boolean*|Turn on-off the sub-workflow FragPipe|
-|```--disable_fp_analyst```|*boolean*|Turn on-off the sub-workflow FragPipe-Analyst|
 
-**Config tools parameters:**
+**Newer version of DIA-NN:**
 |Parameter|Types|Description|
 |---------|-----|-----------|
-|```--config_tools_update```|*boolean*|Force download of all config tools.|
-|```--diann_download```|*string*|Url link to DIA-NN release (If blank ```''```, then built-in DIA-NN will be used)|
+|```--diann_download```|*string*|Url link to [DIA-NN release](https://github.com/vdemichev/DiaNN/releases/latest) (If blank ```''```, then built-in DIA-NN will be used)|
 
 **FragPipe-Analyst parameters:**
 |Parameter|Types|Description|
@@ -326,3 +339,6 @@ The FP-Analyst module produces:
 6. Department of Biochemistry and Molecular Pharmacology, NYU Grossman School of Medicine, NY, USA
 7. Semmelweis University Doctoral School, Budapest, HU
 8. Doctoral School of Biology, ELTE Eötvös Loránd University, Budapest, HU
+
+
+![gif](gif_github.gif)
