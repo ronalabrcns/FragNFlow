@@ -1,6 +1,11 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2 
 
+/* ====================================================
+ Description :   Processes for checking dependencies and downloading necessary tools for FragPipe.
+ ====================================================
+*/
+
 process CHECK_DEPENDENCY{
     input:
         val ion

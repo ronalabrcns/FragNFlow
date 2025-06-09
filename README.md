@@ -256,7 +256,7 @@ Parameters are accesible through the *nextflow.config* file. Additionally, every
 |-----------------|-----|-----------|
 |```--input_folder```|*string*|Folder containing the input files with the specified name conventions LINK|
 |```--mode```|*string*|Data aqcuisition mode (DDA, DIA, TMT)|
-|```--workflow```|*string*|Name of one of the pre-defined <a href="https://fragpipe.nesvilab.org/docs/tutorial_fragpipe_workflows.html" target="_blank"> workflow available in FragPipe</a>|
+|```--workflow```|*string*|Name of one of the pre-defined <a href="https://fragpipe.nesvilab.org/docs/tutorial_fragpipe_workflows.html" target="_blank"> workflow available in FragPipe</a>. Optionally, a custom worfklow file can be specified with file path and *.workflow* extension.|
 |```--fasta_file```|*string*|Path to fasta_file location OR UniProt ID of reference proteome.|
 
 **MSConverter parameters:**
@@ -271,7 +271,9 @@ Parameter|Types|Description|
 |```--decoy_tag```|*string*|The tag identifier used in the fasta file for decoy sequences. Default: *'rev_'*|
 |```--db_split```|*integer*|DB split ...|
 |```--ram```|*integer*|Memory allocation for FragPipe [GB]|
-|```--threads```|*integer*|Number of threads defined for FragPiipe|
+|```--threads```|*integer*|Number of threads defined for FragPipe|
+|```--use_custom_manifest```|*boolean*|There is an option to set custom defined manifest file. !```IMPORTANT```! The input folder path must be specified among the mandatory parameters due to container mounting reasons!|
+|```--custom_manifest```|*string*|Absolute path to custom manifest file.|
 
 
 **Newer version of DIA-NN:**
@@ -314,6 +316,11 @@ The FP-Analyst module produces:
 
 >For deeper exploration and an improved user experience, we highly recommend using the [FragPipe-Analyst](http://fragpipe-analyst.nesvilab.org/) Shiny web app.
 
+-----------
+>For vizual representation of the individual module swithces, please refer to the following illustration.
+
+![gif](gif_github.gif)
+
 ## References
 - FragPipe [[1](https://fragpipe.nesvilab.org/)]
 - FragPipe-Analyst [[2](https://fragpipe-analyst-doc.nesvilab.org/), [3](https://pubs.acs.org/doi/10.1021/acs.jproteome.4c00294)]
@@ -339,6 +346,3 @@ The FP-Analyst module produces:
 6. Department of Biochemistry and Molecular Pharmacology, NYU Grossman School of Medicine, NY, USA
 7. Semmelweis University Doctoral School, Budapest, HU
 8. Doctoral School of Biology, ELTE Eötvös Loránd University, Budapest, HU
-
-
-![gif](gif_github.gif)

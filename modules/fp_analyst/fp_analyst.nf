@@ -1,9 +1,12 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2 
-
-//====================================================
-// FragPipe Analyst process
-//====================================================
+/*
+====================================================
+ FragPipe Analyst process
+----------------------------------------------------
+    Description :   Collects FragPipe output files and runs the FragPipe Analyst tool.
+====================================================
+*/
 
 process COLLECT_FP_ANALYST_FILES{
     publishDir "output/fp_analyst", mode: 'copy'

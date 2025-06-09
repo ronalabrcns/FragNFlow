@@ -3,6 +3,8 @@ nextflow.enable.dsl=2
 
 //====================================================
 // FragPipe process
+// ----------------------------------------------------
+// Description :   Main process for running FragPipe in headless mode.
 //====================================================
 
 process FRAGPIPE{

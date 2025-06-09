@@ -1,6 +1,11 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2 
 
+/* ====================================================
+ Description :   Process for selecting a custom or pre-defined FragPipe workflow.
+ ====================================================
+ */
+
 process WORKFLOW_DB{
     publishDir "data/workflow", mode: 'copy'
 

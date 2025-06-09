@@ -6,7 +6,7 @@
 # Used by: database.nf
 # Parameters: global params used from database.nf
 #============================================================
-#database_dir=$launchDir/data/database
+
 
     echo $input_fasta
 
@@ -14,11 +14,7 @@
     if [[ ! -f "$input_fasta" ]]; then
         echo "Input is a Uniprot ID, downloading FASTA..."
         
-        #if [ ! -d \$database_dir ]; then
-                #mkdir -p database
-        #fi
-        # Download the Uniprot FASTA file
-        #cd database
+
         philosopher workspace --init
         philosopher database --id $input_fasta --prefix $decoy_tag --contam
         philosopher workspace --clean
@@ -27,10 +23,7 @@
     
     else
         echo Checking decoys in $input_fasta
-        # if [ ! -d \$database_dir ]; then
-        #         mkdir -p \$database_dir
-        
-        # fi
+       
         if grep -q $decoy_tag $input_fasta; then
             cat $input_fasta > reference_proteome_decoy.fasta
             echo "Decoys found in the fasta file, proceeding"

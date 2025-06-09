@@ -2,6 +2,9 @@
 print("STARTING ANALYSIS")
 args = commandArgs(trailingOnly=TRUE)
 
+# ======================================
+# FragPipe-Analyst R script
+# ======================================
 
 #library(limma)
 library(FragPipeAnalystR)
@@ -17,7 +20,7 @@ print(args[6])
 print(args[7])
 print(args[8])
 print(args[9])
-#projectDir = args[1]
+
 experiment_annotation = args[1]
 p_table = args[2]
 mode = args[3]
@@ -69,30 +72,6 @@ df <- as.data.frame(table_data)
 head(df)
 write.csv(df, paste(args[9], "/",output_dir,"/output.csv", sep=""), row.names = F)
 
-# get_column_name <- function(mode, plot_mode) {
-#   if (mode == "DIA") {
-#     if (plot_mode == "protein") return("ID")
-#     if (plot_mode == "gene") return("Genes")
-#     return("ID")
-#   } else if (mode == "TMT") {
-#     if (plot_mode == "protein") return("Protein.ID")
-#     if (plot_mode == "gene") return("Index")
-#     return("Protein.ID")
-#   } else {
-#     if (plot_mode == "protein") return("Protein.ID")
-#     if (plot_mode == "gene") return("Gene")
-#     return("Protein.ID")
-#   }
-# }
-
-# col_name <- get_column_name(mode, plot_mode)
-# plot_mode <- col_name
-# params_gene_list <- if (col_name %in% colnames(df)) {
-#   params_gene_list[params_gene_list %in% df[[col_name]]]
-# } else {
-#   c()
-# }
-
 
 if (mode != "DIA") {
 	if (plot_mode == "protein") {
@@ -117,7 +96,7 @@ if (mode != "DIA") {
 		params_gene_list <- c()
 	}
 }
-#TODO: based on mode plot_mode column selection is different!!!
+
 
 plot_cvs(de_data_rejections)
 
@@ -129,7 +108,7 @@ plot_volcano(de_data_rejections, cond[[1]][3], name_col = plot_mode, add_names =
 print(de_data_rejections$p.value)
 
 print(plot_mode)
-#TODOOOOOO
+
 protein_list <- c("Q4KMQ2", "P15559", "A1L0T0", "A0FGR8", "A0JLT2", "O00754", "O14514")
 gene_list <- c("ESYT2", "MED19", "UHRF1BP1L", "SHTN1", "SLC22A23", "MEX3A", "ILVBL")
 

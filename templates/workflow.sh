@@ -9,7 +9,9 @@
 
 if [[ -f $workflow ]]; then
     echo "Using custom workflow file: $workflow"
-    echo $workflow > selected_workflow.workflow
+    cat $workflow > selected_workflow_db.workflow
+    echo "database.db-path=$launchDir/data/database/reference_proteome_decoy.fasta" >> selected_workflow_db.workflow
+    touch diann.workflow
 else
     echo $launchDir
     echo $workflow
@@ -19,7 +21,7 @@ else
     ls /fragpipe_bin/fragpipe-\$fp_version/fragpipe-\$fp_version/workflows/
     
     # Generate selected workflow with the downloaded database
-    echo "#Selected workflow: $workflow" > selected_workflow.workflow
+    echo "#Selected workflow: $workflow" > selected_workflow_db.workflow
     echo "#Adding database fasta file to the selected workflow" >> selected_workflow_db.workflow
     echo "database.db-path=$launchDir/data/database/reference_proteome_decoy.fasta" >> selected_workflow_db.workflow
 

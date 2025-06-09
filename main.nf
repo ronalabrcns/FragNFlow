@@ -7,7 +7,7 @@ nextflow.enable.dsl=2
 -----------------------------------------------------------------------------------------
  Description :   Main workflow for executing Frag'n'Flow. Change parameters in the config file.
  Author      :   Istvan Szepesi-Nagy (szepesi-nagy.istvan@ttk.hu)
- Created     :   2024-04-29
+ Created     :   2024-03-31
  Version     :   v1.0.0
  Repository  :   https://github.com/ronalabrcns/FragNFlow
  License     :   MIT
@@ -99,9 +99,11 @@ workflow FRAGPIPE_WF{
         ram
         diann_download
         analyst_mode
+        custom_manifest
+        manifest_file
 
     main:
-        MANIFEST(input_folder, mode)
+        MANIFEST(input_folder, mode, custom_manifest, manifest_file)
 
         DATABASE(fasta_file, decoy_tag)
 
@@ -145,9 +147,7 @@ workflow {
     ram = Channel.of(params.ram)
 
     if (params.config_tools){
-        //Config Tools
-        //TODO add a disable option for the config tools this way an init install process can be run
-        //without the need of running the whole workflow
+        
         infos = addDownloadInformation()
 
         auth_ch = AUTHENTICATION(infos.download_tools, infos.download_first_name, infos.download_last_name, infos.download_email, infos.download_institution, infos.license_accept)
@@ -165,12 +165,12 @@ workflow {
 
             FRAGPIPE_WF(config_tools_out, input_folder,
                     mode, workflow, fasta_file,
-                    decoy_tag, threads, ram, params.diann_download, params.analyst_mode)
+                    decoy_tag, threads, ram, params.diann_download, params.analyst_mode, params.use_custom_manifest, params.custom_manifest)
         }
         else{
             FRAGPIPE_WF(config_tools_out, MSCONVERTER_WF.out,
                         mode, workflow, fasta_file,
-                        decoy_tag, threads, ram, params.diann_download, params.analyst_mode)
+                        decoy_tag, threads, ram, params.diann_download, params.analyst_mode, params.use_custom_manifest, params.custom_manifest)
         }
     }
     if (!params.disable_fp_analyst){
