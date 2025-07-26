@@ -1,4 +1,3 @@
-
 Please follow the licensing information for MSFragger, IonQuant and diaTrcer softwares provided by the Nesvizhskii Lab:
 
     - IonQuant LICENSE: https://msfragger.arsci.com/ionquant/IonQuant Academic Use License 05162022.pdf
@@ -7,7 +6,7 @@ Please follow the licensing information for MSFragger, IonQuant and diaTrcer sof
 
 "I have read the academic licenses. I understand that the licenses provide with a non-exclusive, non-transferable right to use the tools solely for academic research, non-commercial or educational purposes within the licensee’s department. 
 
-If I am a non-academic user, I will contact the University of Michigan Office of Technology Transfer (Drew Bennett, andbenne@umich.edu) to obtain a commercial license to use the tools." 
+Download available for academic users only. Non-academic users (including those with an existing commercial license from the University of Michigan) must visit Fragmatics at www.fragmatics.com or email info@fragmatics.com to purchase or confirm their license and access the tools." 
 
 --------------------------------------------------------------------------------
 
