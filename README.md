@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/957922445.svg)](https://doi.org/10.5281/zenodo.16600724)
 # Frag'n'Flow
 **Automated Workflow for Large-Scale Quantitative Proteomics in High Performance Computing Environments**
 
