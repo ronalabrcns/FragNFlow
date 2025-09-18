@@ -12,7 +12,7 @@ process FRAGPIPE{
 
     publishDir "output/fragpipe", mode: 'move'
     
-    container 'fcyucn/fragpipe:latest'
+    container 'fcyucn/fragpipe:${params.fragpipe_version}'
     containerOptions "--cleanenv --bind $PWD,$HOME/.config,${params.input_folder},${launchDir},${projectDir}"
 
     input:

@@ -53,7 +53,7 @@ process COLLECT_FP_ANALYST_FILES{
 }
 
 process FP_ANALYST{
-    publishDir "output", mode: 'copy', overwrite: false
+    publishDir "output", mode: 'copy', overwrite: true
     
     container 'sznistvan/fp-anal-hpc:latest'
     containerOptions "--cleanenv --bind $PWD,$HOME/.config,${params.input_folder},${launchDir},${projectDir}"
