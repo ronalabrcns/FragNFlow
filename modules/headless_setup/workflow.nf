@@ -9,7 +9,7 @@ nextflow.enable.dsl=2
 process WORKFLOW_DB{
     publishDir "data/workflow", mode: 'copy'
 
-    container 'fcyucn/fragpipe:latest'
+    container "fcyucn/fragpipe:${params.fragpipe_version}"
     containerOptions "--cleanenv --bind $PWD,$HOME/.config,${params.input_folder},${launchDir},${projectDir}"
 
     input:
