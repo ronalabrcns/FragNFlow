@@ -171,6 +171,20 @@ process{
     }
 }
 ```
+
+**Selecting Container Runtimes**\
+By default, Frag'n'Flow has been tested with ```singularity``` and ```apptainer``` container engines, but users can also run it with other [supported container engines](https://nextflow.io/docs/latest/container.html#) depending on the system setup. Nextflow automatically detects which engine is enabled in the ```*.config``` file.
+```
+singularity {
+     enabled = true
+}
+apptainer {
+     enabled = false
+}
+docker.enabled = false
+podman.enabled = false
+```
+
 \
 **Running as a background process**\
 For long-runnning analysis, it is recommended to start Frag'n'Flow as a background process. This allows uninterrupted execution even if the terminal session is closed (similar to *nohup*). To do so, use the ```-bg``` option and redircet the ouptut to a log file:
